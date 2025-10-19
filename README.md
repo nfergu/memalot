@@ -1,5 +1,6 @@
 <img width="367" height="63" alt="image" src="https://github.com/user-attachments/assets/85471c8e-76c1-4c57-acf0-189282db8f30" />
 
+
 Memalot finds [memory leaks](#definition-of-a-leak) in Python programs.
 
 **Note**: memalot may slow down your program, so be wary of using it in a production system.
