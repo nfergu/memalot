@@ -21,7 +21,7 @@ def my_function():
 my_function()
 ```
 
-In this example the `memalot.start_leak_monitoring(max_object_lifetime=1.0)` line means that Memalot will find objects that have lived for longer than one second and identity them as potential leaks. After a short delay, Memalot will print a report like this to the console:
+In this example the `memalot.start_leak_monitoring(max_object_lifetime=1.0)` line tells Memalot to find objects that have lived for longer than one second and identity them as potential leaks. After a short delay, Memalot will print a report like this to the console:
 
 <img width="541" height="584" alt="image" src="https://github.com/user-attachments/assets/ca07a085-aaee-4332-96bf-6a43d98fa161" />
 
