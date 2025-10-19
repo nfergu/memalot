@@ -2,7 +2,9 @@
 name = "memalot"
 version = "0.7.0"
 description = "Finds memory leaks in Python programs"
-authors = ["Neil Ferguson"]
+authors = [
+    { name = "Neil Ferguson" },
+]
 license = "Apache-2.0"
 readme = "README.md"
 repository = "https://github.com/nfergu/referrers"
