@@ -2,16 +2,37 @@
 <br />
 <br />
 
-Memalot finds [memory leaks](#definition-of-a-leak) in Python programs.
+Memalot finds [memory leaks](#definition-of-a-leak) in Python programs. Memalot prints suspected leaks to the console by default, and also has a CLI and an MCP server for analyzing memory leaks.  
+
+For example, given this Python program which creates a string object every half a second:
+
+```python
+from time import sleep
+import memalot
+
+memalot.start_leak_monitoring(max_object_lifetime=1.0)
+
+def my_function():
+    my_list = []
+    for i in range(100000):
+        my_list.append(f"Object {i}")
+        sleep(0.5)
+
+my_function()
+```
+
+After a short delay, Memalot will print a report like this to the comnole:
 
 **Note**: memalot may slow down your program, so be wary of using it in a production system.
+
+<img width="541" height="584" alt="image" src="https://github.com/user-attachments/assets/ca07a085-aaee-4332-96bf-6a43d98fa161" />
 
 ## Installation
 
 Install using pip:
 
 ```bash
-pip3 install python-memalot
+pip3 install memalot
 ```
 
 ## Getting Started
