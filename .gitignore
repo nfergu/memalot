@@ -200,12 +200,12 @@ cython_debug/
 /.idea/inspectionProfiles/profiles_settings.xml
 /.idea/inspectionProfiles/Project_Default.xml
 /.idea/.gitignore
-/.idea/leaky.iml
+/.idea/memalot.iml
 /.idea/misc.xml
 /.idea/modules.xml
 /.idea/vcs.xml
 /examples/
 
 # Ignore the separate lock file for the MCP server
-/src/leaky/mcp_server/uv.lock
+/src/memalot/mcp_server/uv.lock
 /.aiassistant/

@@ -1,6 +1,6 @@
 import pytest
 
-from leaky.options import InvalidOptionsError, Options
+from memalot.options import InvalidOptionsError, Options
 
 
 class TestOptions:

@@ -14,10 +14,10 @@ class InvalidOptionsError(Exception):
 @dataclass(frozen=True)
 class Options:
     """
-    Options for controlling the behavior of leaky. These are passed to the API as keyword
+    Options for controlling the behavior of memalot. These are passed to the API as keyword
     arguments. For example::
 
-        leaky.start(max_object_lifetime=60.0, force_terminal=True)
+        memalot.start(max_object_lifetime=60.0, force_terminal=True)
 
     In this case, the `force_terminal` argument matches a property in this class.
     """
@@ -134,7 +134,7 @@ class Options:
     a subdirectory of this directory.
 
     If this is `None` (the default), the default directory will be used. This is the
-    `.leaky/reports` directory in the user's home directory.
+    `.memalot/reports` directory in the user's home directory.
 
     To turn off saving of reports entirely, use the `save_reports` option.
     """

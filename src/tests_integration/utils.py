@@ -6,8 +6,14 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from leaky.base import ReferrerGraph
-from leaky.reports import FileReportReader, FullReport, ObjectDetails, ReportIteration, TypeSummary
+from memalot.base import ReferrerGraph
+from memalot.reports import (
+    FileReportReader,
+    FullReport,
+    ObjectDetails,
+    ReportIteration,
+    TypeSummary,
+)
 from tests.utils_for_testing import one
 
 

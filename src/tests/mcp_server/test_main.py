@@ -6,7 +6,7 @@ import pytest
 from fastmcp import Client
 from fastmcp.exceptions import ToolError
 
-from leaky.mcp_server.main import mcp
+from memalot.mcp_server.main import mcp
 
 
 @pytest.fixture(name="test_reports_dir")
@@ -188,7 +188,7 @@ class TestGetLeakReport:
         # Verify leak summary
         assert iteration.leak_summary.iteration == 3
         assert len(iteration.leak_summary.type_summaries) == 2
-        assert iteration.leak_summary.type_summaries[0].object_type == "__main__.LeakyObject"
+        assert iteration.leak_summary.type_summaries[0].object_type == "__main__.MemalotObject"
         assert iteration.leak_summary.type_summaries[0].count == 1
         assert iteration.leak_summary.type_summaries[1].object_type == "builtins.list"
         assert iteration.leak_summary.type_summaries[1].count == 1
@@ -196,7 +196,7 @@ class TestGetLeakReport:
 
         # Verify object details
         assert len(iteration.object_details_list) == 2
-        assert iteration.object_details_list[0].object_type_name == "__main__.LeakyObject"
+        assert iteration.object_details_list[0].object_type_name == "__main__.MemalotObject"
         assert iteration.object_details_list[0].deep_size_bytes.approx_size == 1436
         assert iteration.object_details_list[0].deep_size_bytes.upper_bound_known is True
         assert iteration.object_details_list[0].referrers_checked is True
@@ -246,7 +246,7 @@ class TestGetLeakReport:
         assert iter_2.memory_usage.diff_from_iteration == 1
         assert iter_2.leak_summary.iteration == 2
         assert len(iter_2.leak_summary.type_summaries) == 2
-        assert iter_2.leak_summary.type_summaries[0].object_type == "__main__.LeakyObject"
+        assert iter_2.leak_summary.type_summaries[0].object_type == "__main__.MemalotObject"
         assert iter_2.leak_summary.type_summaries[0].count == 1
         assert len(iter_2.object_details_list) == 2
 
@@ -273,7 +273,7 @@ class TestGetLeakReport:
                 {
                     "report_id": "ykik-ab4l",
                     "report_directory": str(test_reports_dir),
-                    "filter_types": "LeakyObject",
+                    "filter_types": "MemalotObject",
                 },
             )
 
@@ -296,7 +296,7 @@ class TestGetLeakReport:
         # Verify leak summary
         assert iteration.leak_summary.iteration == 3
         assert len(iteration.leak_summary.type_summaries) == 1
-        assert iteration.leak_summary.type_summaries[0].object_type == "__main__.LeakyObject"
+        assert iteration.leak_summary.type_summaries[0].object_type == "__main__.MemalotObject"
         assert iteration.leak_summary.type_summaries[0].count == 1
 
     @pytest.mark.asyncio

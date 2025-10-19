@@ -9,26 +9,26 @@ import objsize
 import referrers
 from referrers import ReferrerGraph
 
-from leaky.base import (
+from memalot.base import (
     ApproximateSize,
-    LeakyCount,
-    LeakyObjectId,
-    LeakyObjectIds,
-    LeakySet,
+    MemalotCount,
+    MemalotObjectId,
+    MemalotObjectIds,
+    MemalotSet,
     ObjectGetter,
     ObjectSignature,
 )
-from leaky.memory import (
-    LeakyMemoryUsage,
+from memalot.memory import (
+    MemalotMemoryUsage,
     get_memory_usage,
 )
-from leaky.options import Options
-from leaky.reports import (
+from memalot.options import Options
+from memalot.reports import (
     LeakSummary,
     ObjectDetails,
     TypeSummary,
 )
-from leaky.utils import (
+from memalot.utils import (
     convert_graph_nodes,
     get_full_type_name,
     get_module_prefix,
@@ -37,14 +37,14 @@ from leaky.utils import (
 
 # Names to replace in the referrer graph when using a decorator. This is obviously a
 # bit brittle, but hopefully integration tests will catch any issues.
-_DECORATOR_WRAPPER_NAME = "leaky_decorator_inner_wrapper"
-_DECORATOR_ARGS_NAME = "leaky_decorator_inner_args"
-_DECORATOR_KWARGS_NAME = "leaky_decorator_inner_kwargs"
+_DECORATOR_WRAPPER_NAME = "memalot_decorator_inner_wrapper"
+_DECORATOR_ARGS_NAME = "memalot_decorator_inner_args"
+_DECORATOR_KWARGS_NAME = "memalot_decorator_inner_kwargs"
 _ARGS_SUBSTITUTION = f"{_DECORATOR_WRAPPER_NAME}.{_DECORATOR_ARGS_NAME}"
 _KWARGS_SUBSTITUTION = f"{_DECORATOR_WRAPPER_NAME}.{_DECORATOR_KWARGS_NAME}"
 
 
-class LeakyObjects:
+class MemalotObjects:
     """
     A collection of objects.
 
@@ -55,7 +55,7 @@ class LeakyObjects:
     def __init__(self, objects: list[Any]) -> None:
         self._objects = objects
 
-    def get_leak_summary(self, iteration: LeakyCount, options: Options) -> LeakSummary:
+    def get_leak_summary(self, iteration: MemalotCount, options: Options) -> LeakSummary:
         """
         Gets a summary of potential leaks.
         """
@@ -110,7 +110,7 @@ class LeakyObjects:
             replacements[_KWARGS_SUBSTITUTION] = f"{function_name} kwargs"
 
         # If module prefixes are not specified, we use the module prefix of the caller
-        # (not the direct caller of this method; the caller of Leaky)
+        # (not the direct caller of this method; the caller of Memalot)
         if options.referrers_module_prefixes is not None:
             module_prefixes = options.referrers_module_prefixes
         else:
@@ -192,12 +192,12 @@ class LeakyObjects:
         return self._objects
 
     def __eq__(self, other: object) -> bool:
-        if not isinstance(other, LeakyObjects):
+        if not isinstance(other, MemalotObjects):
             return False
         return self._objects == other._objects
 
 
-class LeakyUsageSnapshot:
+class MemalotUsageSnapshot:
     """
     A snapshot of memory usage at a particular point in time.
     """
@@ -213,10 +213,10 @@ class LeakyUsageSnapshot:
         # the same ID, that is a different object.
         # However, some builtins (lists, dicts, etc.) do not support weak refs. For these,
         # we use ObjectSignature which allows objects to be compared using heuristics.
-        self._weak_ref_objects: WeakValueDictionary[LeakyObjectId, Any] = WeakValueDictionary()
-        self._non_weak_ref_objects: Dict[LeakyObjectId, ObjectSignature] = {}
+        self._weak_ref_objects: WeakValueDictionary[MemalotObjectId, Any] = WeakValueDictionary()
+        self._non_weak_ref_objects: Dict[MemalotObjectId, ObjectSignature] = {}
         for obj in [obj for obj in objects if filter_condition is None or filter_condition(obj)]:
-            object_id = LeakyObjectId(id(obj))
+            object_id = MemalotObjectId(id(obj))
             try:
                 self._weak_ref_objects[object_id] = obj
             except TypeError:
@@ -244,7 +244,7 @@ class LeakyUsageSnapshot:
         We know for sure whether weakly referenceable objects were part of the snapshot. For
         non-weakly referenceable objects, we base this on heuristics, so we do not know for sure.
         """
-        object_id = LeakyObjectId(id(obj))
+        object_id = MemalotObjectId(id(obj))
         if (
             object_id in self._ids_during_snapshot_creation
             and type(obj) in self._types_during_snapshot_creation
@@ -261,7 +261,7 @@ class LeakyUsageSnapshot:
         """
         Returns `True` if the given object is in the snapshot.
         """
-        object_id = LeakyObjectId(id(obj))
+        object_id = MemalotObjectId(id(obj))
         return object_id in self._weak_ref_objects or (
             object_id in self._non_weak_ref_objects
             and self._non_weak_ref_objects[object_id].is_probably_same_object(obj)
@@ -271,7 +271,7 @@ class LeakyUsageSnapshot:
         self,
         objects_before_snapshot_creation: list[Any],
         object_getter: ObjectGetter,
-    ) -> Tuple[LeakyObjectIds, LeakySet]:
+    ) -> Tuple[MemalotObjectIds, MemalotSet]:
         """
         Gets object IDs of objects that were created during snapshot creation. These are internal
         machinery and need to be excluded.
@@ -280,24 +280,24 @@ class LeakyUsageSnapshot:
         # in `objects_before_snapshot_creation` remain in scope while this function is called
         # and so the IDs of the objects in that list cannot be reused (they are not eligible
         # for garbage collection).
-        id_set = LeakyObjectIds()
-        type_set = LeakySet()
+        id_set = MemalotObjectIds()
+        type_set = MemalotSet()
         obj_object_ids = {id(obj) for obj in objects_before_snapshot_creation}
         for new_obj in object_getter.get_objects():
             new_obj_id = id(new_obj)
             if new_obj_id not in obj_object_ids:
-                id_set.add(LeakyObjectId(new_obj_id))
+                id_set.add(MemalotObjectId(new_obj_id))
                 type_set.add(type(new_obj))
-        id_set_id = LeakyObjectId(id(id_set))
+        id_set_id = MemalotObjectId(id(id_set))
         id_set.add(id_set_id)
         type_set.add(type(id_set_id))
-        type_set_id = LeakyObjectId(id(type_set))
+        type_set_id = MemalotObjectId(id(type_set))
         id_set.add(type_set_id)
         type_set.add(type(type_set_id))
         return id_set, type_set
 
     @property
-    def active_object_ids(self) -> LeakyObjectIds:
+    def active_object_ids(self) -> MemalotObjectIds:
         """
         Returns the IDs of all objects in the snapshot. This includes objects that are
         weakly-referenceable and have not been garbage collected, and *all* objects that are
@@ -306,7 +306,7 @@ class LeakyUsageSnapshot:
         Do not use this to determine whether an object is in the snapshot or not - use
         `is_new_since_snapshot()` for that.
         """
-        return LeakyObjectIds(
+        return MemalotObjectIds(
             set(self._weak_ref_objects.keys()) | set(self._non_weak_ref_objects.keys())
         )
 
@@ -314,12 +314,12 @@ class LeakyUsageSnapshot:
 class MemoryUsageProvider(ABC):
     @abstractmethod
     def rotate_memory_usage(  # pragma: no cover
-        self, iteration: LeakyCount
-    ) -> Tuple[LeakyMemoryUsage | None, LeakyMemoryUsage]:
+        self, iteration: MemalotCount
+    ) -> Tuple[MemalotMemoryUsage | None, MemalotMemoryUsage]:
         pass
 
 
-class LeakySnapshotManager(MemoryUsageProvider):
+class MemalotSnapshotManager(MemoryUsageProvider):
     """
     Manages one or more memory snapshots and allows a report to be generated based on
     these.
@@ -332,21 +332,21 @@ class LeakySnapshotManager(MemoryUsageProvider):
         self._report_id = report_id
 
         # Mutable state
-        self._most_recent_snapshot: LeakyUsageSnapshot | None = None
+        self._most_recent_snapshot: MemalotUsageSnapshot | None = None
         self._most_recent_snapshot_time: datetime | None = None
-        self._added_during_snapshot_creation: LeakyObjectIds | None = None
-        self._most_recent_reported_usage: LeakyMemoryUsage | None = None
+        self._added_during_snapshot_creation: MemalotObjectIds | None = None
+        self._most_recent_reported_usage: MemalotMemoryUsage | None = None
 
     def generate_new_snapshot(
         self,
         object_getter: ObjectGetter,
-        since_snapshot: LeakyUsageSnapshot | None,
+        since_snapshot: MemalotUsageSnapshot | None,
     ) -> None:
         if since_snapshot:
             filter_condition = since_snapshot.is_new_since_snapshot
         else:
             filter_condition = None
-        self._most_recent_snapshot = LeakyUsageSnapshot(
+        self._most_recent_snapshot = MemalotUsageSnapshot(
             object_getter=object_getter, filter_condition=filter_condition
         )
         self._most_recent_snapshot_time = datetime.now(timezone.utc)
@@ -356,8 +356,8 @@ class LeakySnapshotManager(MemoryUsageProvider):
         self._most_recent_snapshot_time = None
 
     def rotate_memory_usage(
-        self, iteration: LeakyCount
-    ) -> Tuple[LeakyMemoryUsage | None, LeakyMemoryUsage]:
+        self, iteration: MemalotCount
+    ) -> Tuple[MemalotMemoryUsage | None, MemalotMemoryUsage]:
         old_usage = self._most_recent_reported_usage
         self._most_recent_reported_usage = get_memory_usage(iteration=iteration)
         return old_usage, self._most_recent_reported_usage
@@ -367,7 +367,7 @@ class LeakySnapshotManager(MemoryUsageProvider):
         return self._report_id
 
     @property
-    def most_recent_snapshot(self) -> LeakyUsageSnapshot | None:
+    def most_recent_snapshot(self) -> MemalotUsageSnapshot | None:
         return self._most_recent_snapshot
 
     @property
@@ -375,7 +375,7 @@ class LeakySnapshotManager(MemoryUsageProvider):
         return self._most_recent_snapshot_time
 
     @property
-    def most_recent_reported_usage(self) -> LeakyMemoryUsage | None:
+    def most_recent_reported_usage(self) -> MemalotMemoryUsage | None:
         return self._most_recent_reported_usage
 
 

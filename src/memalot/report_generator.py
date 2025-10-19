@@ -1,9 +1,9 @@
 from datetime import datetime, timezone
 
-from leaky.base import CachingIterable, LeakyCount
-from leaky.options import Options
-from leaky.output import OutputWriter
-from leaky.reports import (
+from memalot.base import CachingIterable, MemalotCount
+from memalot.options import Options
+from memalot.output import OutputWriter
+from memalot.reports import (
     LeakSummary,
     MemoryUsageOutput,
     ObjectDetails,
@@ -11,7 +11,7 @@ from leaky.reports import (
     ReportWriter,
     get_memory_usage_output,
 )
-from leaky.snapshots import LeakyObjects, MemoryUsageProvider
+from memalot.snapshots import MemalotObjects, MemoryUsageProvider
 
 
 class ReportGenerator:
@@ -24,11 +24,11 @@ class ReportGenerator:
         report_id: str,
         iteration_start_time: datetime | None,
         memory_usage_provider: MemoryUsageProvider,
-        objects: LeakyObjects,
+        objects: MemalotObjects,
         output_writer: OutputWriter,
         report_writer: ReportWriter,
         options: Options,
-        iteration: LeakyCount,
+        iteration: MemalotCount,
         excluded_from_referrers: list[int],
         detailed_report: bool,
         function_name: str | None = None,
@@ -58,11 +58,11 @@ class ReportGenerator:
         report_id: str,
         iteration_start_time: datetime | None,
         memory_usage_provider: MemoryUsageProvider,
-        objects: LeakyObjects,
+        objects: MemalotObjects,
         output_writer: OutputWriter,
         report_writer: ReportWriter,
         options: Options,
-        iteration: LeakyCount,
+        iteration: MemalotCount,
         excluded_from_referrers: list[int],
         detailed_report: bool,
         function_name: str | None = None,
@@ -97,7 +97,7 @@ class ReportGenerator:
         report_writer.write_iteration(iteration=report_iteration)
 
     def _collect_memory_usage_output(
-        self, iteration: LeakyCount, memory_usage_provider: MemoryUsageProvider
+        self, iteration: MemalotCount, memory_usage_provider: MemoryUsageProvider
     ) -> MemoryUsageOutput:
         old_usage, new_usage = memory_usage_provider.rotate_memory_usage(iteration=iteration)
         usage_output = get_memory_usage_output(previous=old_usage, new=new_usage)
@@ -105,9 +105,9 @@ class ReportGenerator:
 
     def _collect_leak_report_data(
         self,
-        objects: LeakyObjects,
+        objects: MemalotObjects,
         options: Options,
-        iteration: LeakyCount,
+        iteration: MemalotCount,
         excluded_from_referrers: list[int],
         detailed_report: bool,
         function_name: str | None = None,

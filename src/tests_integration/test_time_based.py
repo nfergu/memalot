@@ -12,8 +12,8 @@ from typing import Any
 import numpy as np
 import pytest
 
-import leaky
-from leaky.reports import FileReportReader
+import memalot
+from memalot.reports import FileReportReader
 from tests_integration.utils import (
     assert_object_type_details,
     assert_referrer_graphs_have_root_names,
@@ -32,7 +32,7 @@ class Cache:
         self.cache_list: list[Any] = []
 
 
-class LeakyObject:
+class MemalotObject:
     """
     An object with a numpy array payload.
     """
@@ -41,7 +41,7 @@ class LeakyObject:
         self.payload = np.ones(size)
 
 
-class NotLeakyObject:
+class NotMemalotObject:
     """
     An object that is not leaked.
     """
@@ -50,26 +50,26 @@ class NotLeakyObject:
         self.payload = np.ones(size)
 
 
-def create_leaky_object() -> LeakyObject:
+def create_memalot_object() -> MemalotObject:
     """
-    Creates a leaky object after creating a non-leaky object.
+    Creates a memalot object after creating a non-memalot object.
     """
-    _ = NotLeakyObject(128)
-    return LeakyObject(32)
+    _ = NotMemalotObject(128)
+    return MemalotObject(32)
 
 
 def create_and_cache(cache: Cache) -> None:
     """
-    Creates a leaky object and adds it to the cache.
+    Creates a memalot object and adds it to the cache.
     """
-    cache.cache_list.append(create_leaky_object())
+    cache.cache_list.append(create_memalot_object())
 
 
-def create_non_leaky_object_and_cache(cache: Cache) -> None:
+def create_non_memalot_object_and_cache(cache: Cache) -> None:
     """
-    Creates a non-leaky object and adds it to the cache.
+    Creates a non-memalot object and adds it to the cache.
     """
-    cache.cache_list.append(NotLeakyObject(32))
+    cache.cache_list.append(NotMemalotObject(32))
 
 
 class LeakingThread(Thread):
@@ -83,7 +83,7 @@ class LeakingThread(Thread):
         live_for_one_iteration_cache = Cache()
         while not self._stopped:
             create_and_cache(live_forever_cache)
-            create_non_leaky_object_and_cache(live_for_one_iteration_cache)
+            create_non_memalot_object_and_cache(live_for_one_iteration_cache)
             time.sleep(self._iteration_time)
             live_for_one_iteration_cache.cache_list.clear()
 
@@ -117,8 +117,8 @@ class TestCacheExampleTimeBased:
         max_object_lifetime = 1.0
         assert max_object_lifetime > iteration_time
 
-        # when: continuously add leaky objects until we have at least one iteration with leaks
-        stoppable = leaky.start_leak_monitoring(
+        # when: continuously add memalot objects until we have at least one iteration with leaks
+        stoppable = memalot.start_leak_monitoring(
             max_object_lifetime=max_object_lifetime,
             warmup_time=5.0,
             report_directory=tmp_path,
@@ -168,25 +168,25 @@ class TestCacheExampleTimeBased:
         assert len(leak_iterations) >= expected_leak_iterations
 
         for leak_iteration in leak_iterations[:expected_leak_iterations]:
-            # Check type summaries - we expect LeakyObject and ndarray only
+            # Check type summaries - we expect MemalotObject and ndarray only
             type_summaries = leak_iteration.leak_summary.type_summaries
             actual_types = {summary.object_type for summary in type_summaries}
 
-            # Verify that at minimum we have LeakyObject and ndarray
+            # Verify that at minimum we have MemalotObject and ndarray
             required_types = {
-                "tests_integration.test_time_based.LeakyObject",
+                "tests_integration.test_time_based.MemalotObject",
                 "numpy.ndarray",
             }
             assert actual_types == required_types
 
             object_details_list = list(leak_iteration.object_details_list)
 
-            # Verify LeakyObject
+            # Verify MemalotObject
             assert_object_type_details(
                 object_details_list=object_details_list,
-                object_type="tests_integration.test_time_based.LeakyObject",
+                object_type="tests_integration.test_time_based.MemalotObject",
                 expected_count=2,
-                expected_target_names={"LeakyObject (object)"},
+                expected_target_names={"MemalotObject (object)"},
             )
 
             # Verify ndarray
@@ -197,7 +197,7 @@ class TestCacheExampleTimeBased:
                 expected_target_names={"ndarray (object)"},
             )
 
-            # Verify root names for LeakyObject and ndarray
+            # Verify root names for MemalotObject and ndarray
             # Both should trace back to the cache
             expected_root_names = {
                 "run.live_forever_cache (local)",

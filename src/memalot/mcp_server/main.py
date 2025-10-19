@@ -6,14 +6,14 @@ from fastmcp import FastMCP
 from mcp.types import ToolAnnotations
 from pydantic.dataclasses import dataclass
 
-from leaky.reports import (
+from memalot.reports import (
     FullReport,
     ReportSummary,
     filter_iteration_by_types,
     get_report_reader,
 )
 
-mcp: FastMCP[Any] = FastMCP("Leaky MCP Server")
+mcp: FastMCP[Any] = FastMCP("Memalot MCP Server")
 
 
 @dataclass
@@ -46,7 +46,7 @@ def list_leak_reports(num_reports: int = 5, report_directory: str | None = None)
     Args:
         num_reports: The number of reports to return.
         report_directory: The directory to search for reports. If `None`, the
-        default directory will be used. This is the `.leaky/reports` directory
+        default directory will be used. This is the `.memalot/reports` directory
         in the user's home directory.
 
     Returns:
@@ -117,7 +117,7 @@ def get_leak_report(
 
 def main() -> None:  # pragma: no cover
     """
-    Run the Leaky MCP server.
+    Run the Memalot MCP server.
     """
     mcp.run()
 

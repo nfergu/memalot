@@ -7,7 +7,7 @@ from pydantic.dataclasses import dataclass
 _HASHABLE_TYPE = collections.abc.Hashable
 
 
-class LeakyInt(int):
+class MemalotInt(int):
     """
     An int. This is used in preference to int so that it can be excluded from reports.
     """
@@ -15,7 +15,7 @@ class LeakyInt(int):
     pass
 
 
-class LeakyCount(int):
+class MemalotCount(int):
     """
     A count. This is used in preference to int so that it can be excluded from reports.
     """
@@ -23,26 +23,26 @@ class LeakyCount(int):
     pass
 
 
-class LeakyObjectId(int):
+class MemalotObjectId(int):
     """
     An object ID. This is used in preference to int so that it can be excluded from reports.
     """
 
 
-class LeakyObjectIds(set[int]):
+class MemalotObjectIds(set[int]):
     """
     A set of object IDs. This is used in preference to a set so that it can be excluded
     from reports.
     """
 
 
-class LeakyList(list[Any]):
+class MemalotList(list[Any]):
     """
     A list. This is used in preference to a regular list so that it can be excluded from reports.
     """
 
 
-class LeakySet(set[Any]):
+class MemalotSet(set[Any]):
     """
     A set. This is used in preference to a regular list so that it can be excluded from reports.
     """
@@ -60,11 +60,11 @@ class ObjectSignature:
     """
 
     def __init__(self, obj: Any) -> None:
-        self._id = LeakyObjectId(id(obj))
+        self._id = MemalotObjectId(id(obj))
         self._type = type(obj)
         self._signature = self._get_hash(obj)
 
-    def _get_hash(self, obj: Any) -> LeakyInt:
+    def _get_hash(self, obj: Any) -> MemalotInt:
         try:
             return self._hash(obj)
         except Exception:
@@ -73,14 +73,14 @@ class ObjectSignature:
         # error occurs getting the hash). This isn't great, since it won't work for collections
         # like dicts and lists, but there's probably not much we can do about that
         # (they're mutable anyway, so comparing their contents won't help us much).
-        return LeakyInt(id(self))
+        return MemalotInt(id(self))
 
-    def _hash(self, obj: Any) -> LeakyInt:
-        return LeakyInt(hash(obj))
+    def _hash(self, obj: Any) -> MemalotInt:
+        return MemalotInt(hash(obj))
 
     def is_probably_same_object(self, obj: Any) -> bool:
         return (
-            LeakyObjectId(id(obj)) == self._id and type(obj) is self._type and self._get_hash(obj)
+            MemalotObjectId(id(obj)) == self._id and type(obj) is self._type and self._get_hash(obj)
         ) == self._signature
 
 

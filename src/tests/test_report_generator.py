@@ -4,12 +4,12 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from leaky.base import ApproximateSize, CachingIterable, LeakyCount
-from leaky.memory import LeakyMemoryUsage
-from leaky.options import Options
-from leaky.output import Output, OutputWriter
-from leaky.report_generator import ReportGenerator
-from leaky.reports import (
+from memalot.base import ApproximateSize, CachingIterable, MemalotCount
+from memalot.memory import MemalotMemoryUsage
+from memalot.options import Options
+from memalot.output import Output, OutputWriter
+from memalot.report_generator import ReportGenerator
+from memalot.reports import (
     LeakSummary,
     MemoryUsageOutput,
     ObjectDetails,
@@ -17,7 +17,7 @@ from leaky.reports import (
     ReportWriter,
     TypeSummary,
 )
-from leaky.snapshots import LeakyObjects, LeakySnapshotManager
+from memalot.snapshots import MemalotObjects, MemalotSnapshotManager
 from tests.utils_for_testing import create_mock
 
 
@@ -61,11 +61,11 @@ def _report_generator() -> ReportGenerator:
 
 
 @pytest.fixture(name="mock_iteration")
-def _mock_iteration() -> LeakyCount:
+def _mock_iteration() -> MemalotCount:
     """
-    Creates a LeakyCount instance for testing.
+    Creates a MemalotCount instance for testing.
     """
-    return LeakyCount(3)
+    return MemalotCount(3)
 
 
 @pytest.fixture(name="mock_type_summaries")
@@ -86,7 +86,7 @@ def _mock_type_summaries() -> list[TypeSummary]:
 
 @pytest.fixture(name="mock_leak_summary")
 def _mock_leak_summary(
-    mock_iteration: LeakyCount, mock_type_summaries: list[TypeSummary]
+    mock_iteration: MemalotCount, mock_type_summaries: list[TypeSummary]
 ) -> LeakSummary:
     return LeakSummary(
         iteration=mock_iteration,
@@ -100,8 +100,8 @@ def _mock_object_details() -> list[ObjectDetails]:
 
 
 @pytest.fixture(name="mock_memory_usage")
-def _mock_memory_usage(mock_iteration: LeakyCount) -> LeakyMemoryUsage:
-    return LeakyMemoryUsage(
+def _mock_memory_usage(mock_iteration: MemalotCount) -> MemalotMemoryUsage:
+    return MemalotMemoryUsage(
         current_rss_bytes=1024 * 1024,
         peak_rss_bytes=2048 * 1024,
         system_percent_used=25.5,
@@ -113,11 +113,11 @@ def _mock_memory_usage(mock_iteration: LeakyCount) -> LeakyMemoryUsage:
 def _mock_objects_with_details(
     mock_leak_summary: LeakSummary,
     mock_object_details: list[ObjectDetails],
-) -> LeakyObjects:
+) -> MemalotObjects:
     """
-    Creates LeakyObjects with mocked details.
+    Creates MemalotObjects with mocked details.
     """
-    mock_objects = create_mock(spec=LeakyObjects)
+    mock_objects = create_mock(spec=MemalotObjects)
     mock_objects.generate_object_details.return_value = iter(mock_object_details)
     mock_objects.get_leak_summary.return_value = mock_leak_summary
     mock_objects.__len__.return_value = 8
@@ -125,11 +125,11 @@ def _mock_objects_with_details(
 
 
 @pytest.fixture(name="mock_empty_objects")
-def _mock_empty_objects() -> LeakyObjects:
+def _mock_empty_objects() -> MemalotObjects:
     """
-    Creates empty LeakyObjects.
+    Creates empty MemalotObjects.
     """
-    mock_objects = create_mock(spec=LeakyObjects)
+    mock_objects = create_mock(spec=MemalotObjects)
     mock_objects.generate_object_details.return_value = iter([])
     mock_objects.get_leak_summary.return_value = create_mock(spec=LeakSummary)
     mock_objects.__len__.return_value = 0
@@ -138,27 +138,27 @@ def _mock_empty_objects() -> LeakyObjects:
 
 @pytest.fixture(name="mock_memory_usage_provider")
 def _mock_memory_usage_provider(
-    mock_memory_usage: LeakyMemoryUsage,
+    mock_memory_usage: MemalotMemoryUsage,
 ) -> MagicMock:
     """
     Creates a mock memory usage provider for testing.
     """
-    mock_provider = create_mock(spec=LeakySnapshotManager)
+    mock_provider = create_mock(spec=MemalotSnapshotManager)
     mock_provider.rotate_memory_usage.return_value = None, mock_memory_usage
     return mock_provider
 
 
 @pytest.fixture(name="mock_memory_usage_provider_with_previous")
 def _mock_memory_usage_provider_with_previous(
-    mock_memory_usage: LeakyMemoryUsage,
-    mock_iteration: LeakyCount,
+    mock_memory_usage: MemalotMemoryUsage,
+    mock_iteration: MemalotCount,
 ) -> MagicMock:
     """
     Creates a mock memory usage provider with previous memory usage.
     """
-    mock_provider = create_mock(spec=LeakySnapshotManager)
+    mock_provider = create_mock(spec=MemalotSnapshotManager)
     mock_provider.rotate_memory_usage.return_value = (
-        LeakyMemoryUsage(
+        MemalotMemoryUsage(
             current_rss_bytes=0,
             peak_rss_bytes=0,
             system_percent_used=0,
@@ -214,8 +214,8 @@ class TestReportGenerator:
         fake_report_writer: _FakeReportWriter,
         default_options: Options,
         test_objects: list[Any],
-        mock_iteration: LeakyCount,
-        mock_memory_usage: LeakyMemoryUsage,
+        mock_iteration: MemalotCount,
+        mock_memory_usage: MemalotMemoryUsage,
     ) -> None:
         """
         Tests the basic flow of the generate_report method with detailed_report=True.
@@ -228,7 +228,7 @@ class TestReportGenerator:
             report_id="test-report-123",
             iteration_start_time=iteration_start_time,
             memory_usage_provider=mock_memory_usage_provider,
-            objects=LeakyObjects(test_objects),
+            objects=MemalotObjects(test_objects),
             output_writer=fake_output_writer,
             report_writer=fake_report_writer,
             options=default_options,
@@ -285,8 +285,8 @@ class TestReportGenerator:
         fake_report_writer: _FakeReportWriter,
         default_options: Options,
         test_objects: list[Any],
-        mock_iteration: LeakyCount,
-        mock_memory_usage: LeakyMemoryUsage,
+        mock_iteration: MemalotCount,
+        mock_memory_usage: MemalotMemoryUsage,
     ) -> None:
         """
         Tests the generate_report method and detailed_report=True.
@@ -300,7 +300,7 @@ class TestReportGenerator:
             report_id="test-report-123",
             iteration_start_time=iteration_start_time,
             memory_usage_provider=mock_memory_usage_provider,
-            objects=LeakyObjects(test_objects),
+            objects=MemalotObjects(test_objects),
             output_writer=fake_output_writer,
             report_writer=fake_report_writer,
             options=default_options,
@@ -321,8 +321,8 @@ class TestReportGenerator:
         fake_report_writer: _FakeReportWriter,
         default_options: Options,
         test_objects: list[Any],
-        mock_iteration: LeakyCount,
-        mock_memory_usage: LeakyMemoryUsage,
+        mock_iteration: MemalotCount,
+        mock_memory_usage: MemalotMemoryUsage,
     ) -> None:
         """
         Tests the generate_report method with empty objects and detailed_report=True.
@@ -334,7 +334,7 @@ class TestReportGenerator:
             report_id="test-report-123",
             iteration_start_time=iteration_start_time,
             memory_usage_provider=mock_memory_usage_provider,
-            objects=LeakyObjects([]),
+            objects=MemalotObjects([]),
             output_writer=fake_output_writer,
             report_writer=fake_report_writer,
             options=default_options,
@@ -366,8 +366,8 @@ class TestReportGenerator:
         fake_report_writer: _FakeReportWriter,
         default_options: Options,
         test_objects: list[Any],
-        mock_iteration: LeakyCount,
-        mock_memory_usage: LeakyMemoryUsage,
+        mock_iteration: MemalotCount,
+        mock_memory_usage: MemalotMemoryUsage,
     ) -> None:
         """
         Tests the generate_report method with previous memory usage present and
@@ -380,7 +380,7 @@ class TestReportGenerator:
             report_id="test-report-123",
             iteration_start_time=iteration_start_time,
             memory_usage_provider=mock_memory_usage_provider_with_previous,
-            objects=LeakyObjects([]),
+            objects=MemalotObjects([]),
             output_writer=fake_output_writer,
             report_writer=fake_report_writer,
             options=default_options,
@@ -408,8 +408,8 @@ class TestReportGenerator:
         fake_report_writer: _FakeReportWriter,
         default_options: Options,
         test_objects: list[Any],
-        mock_iteration: LeakyCount,
-        mock_memory_usage: LeakyMemoryUsage,
+        mock_iteration: MemalotCount,
+        mock_memory_usage: MemalotMemoryUsage,
     ) -> None:
         """
         Tests the generate_report method with detailed_report=False returns empty summary
@@ -423,7 +423,7 @@ class TestReportGenerator:
             report_id="test-report-123",
             iteration_start_time=iteration_start_time,
             memory_usage_provider=mock_memory_usage_provider,
-            objects=LeakyObjects(test_objects),
+            objects=MemalotObjects(test_objects),
             output_writer=fake_output_writer,
             report_writer=fake_report_writer,
             options=default_options,

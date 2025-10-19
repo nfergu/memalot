@@ -3,18 +3,18 @@ from unittest.mock import ANY, MagicMock, call
 
 import pytest
 
-from leaky.base import LeakyCount, LeakyObjectIds, ObjectGetter
-from leaky.monitors import (
+from memalot.base import MemalotCount, MemalotObjectIds, ObjectGetter
+from memalot.monitors import (
     FilteringObjectGetter,
     LeakMonitorImpl,
     LeakMonitorThread,
     StopMonitorThreadException,
 )
-from leaky.options import Options
-from leaky.output import OutputWriter
-from leaky.report_generator import ReportGenerator
-from leaky.reports import ReportWriter
-from leaky.snapshots import LeakyObjects, LeakySnapshotManager, LeakyUsageSnapshot
+from memalot.options import Options
+from memalot.output import OutputWriter
+from memalot.report_generator import ReportGenerator
+from memalot.reports import ReportWriter
+from memalot.snapshots import MemalotObjects, MemalotSnapshotManager, MemalotUsageSnapshot
 from tests.utils_for_testing import create_mock, wait_for_assertion
 
 
@@ -37,25 +37,25 @@ def _mock_report_writer() -> MagicMock:
 @pytest.fixture(name="mock_snapshot_manager")
 def _mock_snapshot_manager() -> MagicMock:
     """
-    Mock LeakySnapshotManager for testing.
+    Mock MemalotSnapshotManager for testing.
     """
-    return create_mock(spec=LeakySnapshotManager)
+    return create_mock(spec=MemalotSnapshotManager)
 
 
 @pytest.fixture(name="mock_all_objects_manager")
 def _mock_all_objects_manager() -> MagicMock:
     """
-    Mock LeakySnapshotManager for all objects tracking.
+    Mock MemalotSnapshotManager for all objects tracking.
     """
-    return create_mock(spec=LeakySnapshotManager)
+    return create_mock(spec=MemalotSnapshotManager)
 
 
 @pytest.fixture(name="mock_new_objects_manager")
 def _mock_new_objects_manager() -> MagicMock:
     """
-    Mock LeakySnapshotManager for new objects tracking.
+    Mock MemalotSnapshotManager for new objects tracking.
     """
-    return create_mock(spec=LeakySnapshotManager)
+    return create_mock(spec=MemalotSnapshotManager)
 
 
 @pytest.fixture(name="mock_report_generator")
@@ -138,11 +138,11 @@ class TestLeakMonitorImpl:
             report_id=mock_snapshot_manager.report_id,
             iteration_start_time=mock_snapshot_manager.most_recent_snapshot_time,
             memory_usage_provider=mock_snapshot_manager,
-            objects=LeakyObjects(objects_on_exit),
+            objects=MemalotObjects(objects_on_exit),
             output_writer=mock_output_writer,
             report_writer=mock_report_writer,
             options=test_options,
-            iteration=LeakyCount(1),
+            iteration=MemalotCount(1),
             detailed_report=True,
             function_name=None,
             excluded_from_referrers=ANY,  # Dynamic object IDs, but should have 1 element
@@ -195,8 +195,8 @@ class TestLeakMonitorImpl:
         mock_report_generator.generate_report.assert_called_once()
 
         kwargs = mock_report_generator.generate_report.call_args.kwargs
-        assert kwargs["objects"] == LeakyObjects([])
-        assert kwargs["excluded_from_referrers"] == [id(LeakyObjectIds())]
+        assert kwargs["objects"] == MemalotObjects([])
+        assert kwargs["excluded_from_referrers"] == [id(MemalotObjectIds())]
 
         mock_snapshot_manager.clear_snapshots.assert_called_once()
 
@@ -245,7 +245,7 @@ class TestLeakMonitorImpl:
 
         # Check that generate_report was called with correct parameters
         # This should be the objects from exit_1 that are still alive at exit_2
-        expected_objects = LeakyObjects(["exit2"])
+        expected_objects = MemalotObjects(["exit2"])
         mock_report_generator.generate_report.assert_called_once_with(
             report_id=mock_snapshot_manager.report_id,
             iteration_start_time=mock_snapshot_manager.most_recent_snapshot_time,
@@ -254,7 +254,7 @@ class TestLeakMonitorImpl:
             output_writer=mock_output_writer,
             report_writer=mock_report_writer,
             options=test_options,
-            iteration=LeakyCount(1),
+            iteration=MemalotCount(1),
             detailed_report=True,
             function_name=None,
             excluded_from_referrers=ANY,  # Dynamic object IDs, but should have 1 element
@@ -328,11 +328,11 @@ class TestLeakMonitorImpl:
                     report_id=mock_snapshot_manager.report_id,
                     iteration_start_time=mock_snapshot_manager.most_recent_snapshot_time,
                     memory_usage_provider=mock_snapshot_manager,
-                    objects=LeakyObjects(exit_1),
+                    objects=MemalotObjects(exit_1),
                     output_writer=mock_output_writer,
                     report_writer=mock_report_writer,
                     options=test_options,
-                    iteration=LeakyCount(1),
+                    iteration=MemalotCount(1),
                     detailed_report=True,
                     function_name=None,
                     excluded_from_referrers=ANY,  # Dynamic object IDs, but should have 1 element
@@ -341,11 +341,11 @@ class TestLeakMonitorImpl:
                     report_id=mock_snapshot_manager.report_id,
                     iteration_start_time=mock_snapshot_manager.most_recent_snapshot_time,
                     memory_usage_provider=mock_snapshot_manager,
-                    objects=LeakyObjects(exit_2),
+                    objects=MemalotObjects(exit_2),
                     output_writer=mock_output_writer,
                     report_writer=mock_report_writer,
                     options=test_options,
-                    iteration=LeakyCount(2),
+                    iteration=MemalotCount(2),
                     detailed_report=True,
                     function_name=None,
                     excluded_from_referrers=ANY,  # Dynamic object IDs, but should have 1 element
@@ -439,11 +439,11 @@ class TestLeakMonitorImpl:
             report_id=mock_snapshot_manager.report_id,
             iteration_start_time=mock_snapshot_manager.most_recent_snapshot_time,
             memory_usage_provider=mock_snapshot_manager,
-            objects=LeakyObjects([]),
+            objects=MemalotObjects([]),
             output_writer=mock_output_writer,
             report_writer=mock_report_writer,
             options=test_options,
-            iteration=LeakyCount(1),
+            iteration=MemalotCount(1),
             excluded_from_referrers=ANY,  # Dynamic object IDs, but should have 1 element
             detailed_report=False,
             function_name=None,
@@ -485,11 +485,11 @@ class TestLeakMonitorImpl:
             report_id=mock_snapshot_manager.report_id,
             iteration_start_time=mock_snapshot_manager.most_recent_snapshot_time,
             memory_usage_provider=mock_snapshot_manager,
-            objects=LeakyObjects(expected_objects),
+            objects=MemalotObjects(expected_objects),
             output_writer=mock_output_writer,
             report_writer=mock_report_writer,
             options=test_options,
-            iteration=LeakyCount(2),
+            iteration=MemalotCount(2),
             excluded_from_referrers=ANY,
             detailed_report=True,
             function_name=None,
@@ -528,7 +528,7 @@ class TestLeakMonitorThread:
         # Only one call to get_objects in the first iteration (for the snapshot)
         mock_get_objects_func.side_effect = [snapshot_objects]
 
-        # Mock the snapshot to return empty LeakyObjects for the first report
+        # Mock the snapshot to return empty MemalotObjects for the first report
         # since no previous snapshot exists
         mock_all_objects_manager.most_recent_snapshot = None
         mock_new_objects_manager.most_recent_snapshot = None
@@ -583,11 +583,11 @@ class TestLeakMonitorThread:
             report_id=mock_all_objects_manager.report_id,
             iteration_start_time=mock_all_objects_manager.most_recent_snapshot_time,
             memory_usage_provider=mock_all_objects_manager,
-            objects=LeakyObjects([]),
+            objects=MemalotObjects([]),
             output_writer=mock_output_writer,
             report_writer=mock_report_writer,
             options=test_options,
-            iteration=LeakyCount(1),
+            iteration=MemalotCount(1),
             detailed_report=False,  # First iteration is warmup
             excluded_from_referrers=[],
         )
@@ -620,7 +620,7 @@ class TestLeakMonitorThread:
             report_2_objects,  # Second iteration: for checking objects in snapshot
         ]
 
-        mock_new_snapshot = create_mock(spec=LeakyUsageSnapshot)
+        mock_new_snapshot = create_mock(spec=MemalotUsageSnapshot)
         mock_new_objects_manager.most_recent_snapshot = mock_new_snapshot
         # Mock is_in_snapshot to filter objects - only return True for objects in snapshot_objects
         mock_new_snapshot.is_in_snapshot.side_effect = lambda obj: obj in snapshot_objects
@@ -667,11 +667,11 @@ class TestLeakMonitorThread:
                     report_id=mock_all_objects_manager.report_id,
                     iteration_start_time=mock_all_objects_manager.most_recent_snapshot_time,
                     memory_usage_provider=mock_all_objects_manager,
-                    objects=LeakyObjects([]),
+                    objects=MemalotObjects([]),
                     output_writer=mock_output_writer,
                     report_writer=mock_report_writer,
                     options=test_options,
-                    iteration=LeakyCount(1),
+                    iteration=MemalotCount(1),
                     detailed_report=False,  # First iteration is warmup
                     excluded_from_referrers=[],
                 ),
@@ -679,11 +679,11 @@ class TestLeakMonitorThread:
                     report_id=mock_all_objects_manager.report_id,
                     iteration_start_time=mock_all_objects_manager.most_recent_snapshot_time,
                     memory_usage_provider=mock_all_objects_manager,
-                    objects=LeakyObjects(snapshot_objects),  # Only objects that passed the filter
+                    objects=MemalotObjects(snapshot_objects),  # Only objects that passed the filter
                     output_writer=mock_output_writer,
                     report_writer=mock_report_writer,
                     options=test_options,
-                    iteration=LeakyCount(2),
+                    iteration=MemalotCount(2),
                     detailed_report=True,  # Second iteration is detailed
                     excluded_from_referrers=[],
                 ),

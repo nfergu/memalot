@@ -5,27 +5,27 @@ from itertools import chain
 from threading import Thread
 from typing import Any, Callable, Iterable
 
-from leaky.base import (
-    LeakyCount,
-    LeakyInt,
-    LeakyList,
-    LeakyObjectId,
-    LeakyObjectIds,
-    LeakySet,
+from memalot.base import (
+    MemalotCount,
+    MemalotInt,
+    MemalotList,
+    MemalotObjectId,
+    MemalotObjectIds,
+    MemalotSet,
     ObjectGetter,
     ObjectSignature,
 )
-from leaky.interface import LeakMonitor, Stoppable
-from leaky.memory import LeakyMemoryUsage
-from leaky.objects import filter_objects
-from leaky.options import Options
-from leaky.output import OutputWriter
-from leaky.report_generator import ReportGenerator
-from leaky.reports import ReportWriter
-from leaky.snapshots import (
-    LeakyObjects,
-    LeakySnapshotManager,
-    LeakyUsageSnapshot,
+from memalot.interface import LeakMonitor, Stoppable
+from memalot.memory import MemalotMemoryUsage
+from memalot.objects import filter_objects
+from memalot.options import Options
+from memalot.output import OutputWriter
+from memalot.report_generator import ReportGenerator
+from memalot.reports import ReportWriter
+from memalot.snapshots import (
+    MemalotObjects,
+    MemalotSnapshotManager,
+    MemalotUsageSnapshot,
 )
 
 LOG = logging.getLogger(__name__)
@@ -44,7 +44,7 @@ class LeakMonitorImpl(LeakMonitor):
         warmup_calls: int,
         calls_per_report: int,
         options: Options,
-        snapshot_manager: LeakySnapshotManager,
+        snapshot_manager: MemalotSnapshotManager,
         object_getter: ObjectGetter,
         function_name: str | None = None,
         report_generator: ReportGenerator | None = None,
@@ -60,19 +60,19 @@ class LeakMonitorImpl(LeakMonitor):
         self._object_getter = object_getter
 
         # Mutable state
-        self._call_count: LeakyCount = LeakyCount(0)
-        self._report_iteration: LeakyCount = LeakyCount(0)
-        self._calls_since_previous_report: LeakyCount = LeakyCount(0)
-        self._object_ids_from_first_call: LeakyObjectIds = LeakyObjectIds()
+        self._call_count: MemalotCount = MemalotCount(0)
+        self._report_iteration: MemalotCount = MemalotCount(0)
+        self._calls_since_previous_report: MemalotCount = MemalotCount(0)
+        self._object_ids_from_first_call: MemalotObjectIds = MemalotObjectIds()
         self._adding_during_snapshot_creation = None
 
     def __enter__(self) -> None:
         """
         Enters the context manager.
         """
-        self._call_count = LeakyCount(self._call_count + 1)
+        self._call_count = MemalotCount(self._call_count + 1)
         if self._call_count > self._warmup_calls:
-            self._calls_since_previous_report = LeakyCount(self._calls_since_previous_report + 1)
+            self._calls_since_previous_report = MemalotCount(self._calls_since_previous_report + 1)
         # Only generate a snapshot after the warmup time, and if this is the first call
         # since the previous report. This snapshot contains *all* objects.
         if self._call_count > self._warmup_calls and self._calls_since_previous_report == 1:
@@ -111,7 +111,7 @@ class LeakMonitorImpl(LeakMonitor):
                 return
             elif self._call_count == self._warmup_calls:
                 # For warmup iterations, we don't include any objects in the report at all.
-                report_objects = LeakyObjects([])
+                report_objects = MemalotObjects([])
             elif self._call_count > self._warmup_calls and self._calls_per_report == 1:
                 # If we are generating a report on every call, the objects to include in the report
                 # are just those in the snapshot diff.
@@ -135,7 +135,7 @@ class LeakMonitorImpl(LeakMonitor):
                     f"{self._warmup_calls}; Calls per report: {self._calls_per_report}."
                 )
 
-            self._report_iteration = LeakyCount(self._report_iteration + 1)
+            self._report_iteration = MemalotCount(self._report_iteration + 1)
             self._report_generator.generate_report(
                 report_id=self._snapshot_manager.report_id,
                 iteration_start_time=self._snapshot_manager.most_recent_snapshot_time,
@@ -154,25 +154,25 @@ class LeakMonitorImpl(LeakMonitor):
             )
             self._snapshot_manager.clear_snapshots()
             self._adding_during_snapshot_creation = None
-            self._calls_since_previous_report = LeakyCount(0)
-            self._object_ids_from_first_call = LeakyObjectIds()
+            self._calls_since_previous_report = MemalotCount(0)
+            self._object_ids_from_first_call = MemalotObjectIds()
 
-    def _get_objects_in_snapshot(self) -> LeakyObjects:
+    def _get_objects_in_snapshot(self) -> MemalotObjects:
         assert self._snapshot_manager.most_recent_snapshot is not None
-        objects_list = LeakyList()
+        objects_list = MemalotList()
         for obj in self._object_getter.get_objects():
             if self._snapshot_manager.most_recent_snapshot.is_in_snapshot(obj):
                 objects_list.append(obj)
-        report_objects = LeakyObjects(objects_list)
+        report_objects = MemalotObjects(objects_list)
         return report_objects
 
-    def _get_new_objects_since_snapshot(self) -> LeakyObjects:
+    def _get_new_objects_since_snapshot(self) -> MemalotObjects:
         assert self._snapshot_manager.most_recent_snapshot is not None
-        objects_list = LeakyList()
+        objects_list = MemalotList()
         for obj in self._object_getter.get_objects():
             if self._snapshot_manager.most_recent_snapshot.is_new_since_snapshot(obj):
                 objects_list.append(obj)
-        report_objects = LeakyObjects(objects_list)
+        report_objects = MemalotObjects(objects_list)
         return report_objects
 
 
@@ -196,8 +196,8 @@ class LeakMonitorThread(Thread, Stoppable):
         writer: OutputWriter,
         report_writer: ReportWriter,
         options: Options,
-        all_objects_manager: LeakySnapshotManager,
-        new_objects_manager: LeakySnapshotManager,
+        all_objects_manager: MemalotSnapshotManager,
+        new_objects_manager: MemalotSnapshotManager,
         object_getter: ObjectGetter,
         report_generator: ReportGenerator | None = None,
         sleep_func: Callable[[float], None] = time.sleep,
@@ -215,7 +215,7 @@ class LeakMonitorThread(Thread, Stoppable):
         self._sleep_func = sleep_func
 
         # Mutable state
-        self._report_iteration: LeakyCount = LeakyCount(0)
+        self._report_iteration: MemalotCount = MemalotCount(0)
         self._should_stop: bool = False
 
     def stop(self) -> None:
@@ -253,9 +253,9 @@ class LeakMonitorThread(Thread, Stoppable):
 
     def _run_iteration(self) -> None:
         # If this is the warmup iteration, we don't include any objects in the report.
-        self._report_iteration = LeakyCount(self._report_iteration + 1)
-        if self._report_iteration == LeakyCount(1):
-            report_objects = LeakyObjects([])
+        self._report_iteration = MemalotCount(self._report_iteration + 1)
+        if self._report_iteration == MemalotCount(1):
+            report_objects = MemalotObjects([])
         else:
             report_objects = self._get_report_objects()
         # Generate a snapshot with only new objects in it. These are objects that have
@@ -276,7 +276,7 @@ class LeakMonitorThread(Thread, Stoppable):
             iteration=self._report_iteration,
             excluded_from_referrers=[],
             # On the warmup iteration, do not generate a detailed report
-            detailed_report=self._report_iteration > LeakyCount(1),
+            detailed_report=self._report_iteration > MemalotCount(1),
         )
         # Take a snapshot with all objects in it. We need to take this *after* the report
         # so that the next  "new objects" snapshot does not include objects created as part
@@ -289,18 +289,18 @@ class LeakMonitorThread(Thread, Stoppable):
         self._sleep_func(self._max_object_lifetime)
         gc.collect()
 
-    def _get_report_objects(self) -> LeakyObjects:
+    def _get_report_objects(self) -> MemalotObjects:
         # The objects to include in the report are those that are in the new objects snapshot
         # and are still alive. This means they've lived for at least the maximum object
         # lifetime.
         assert self._new_objects_manager.most_recent_snapshot is not None
         # This can't be a list comprehension because in Python <= 3.11 this gets reported as a
         # leak.
-        objects_list = LeakyList()
+        objects_list = MemalotList()
         for obj in self._object_getter.get_objects():
             if self._new_objects_manager.most_recent_snapshot.is_in_snapshot(obj):
                 objects_list.append(obj)
-        report_objects = LeakyObjects(objects_list)
+        report_objects = MemalotObjects(objects_list)
         return report_objects
 
 
@@ -313,7 +313,7 @@ class FilteringObjectGetter(ObjectGetter):
         self,
         get_objects_func: Callable[[int], list[Any]],
         options: Options,
-        snapshot_managers: list[LeakySnapshotManager],
+        snapshot_managers: list[MemalotSnapshotManager],
     ) -> None:
         self._get_objects_func = get_objects_func
         self._options = options
@@ -328,7 +328,7 @@ class FilteringObjectGetter(ObjectGetter):
             excluded_types=EXCLUDED_TYPES,
             included_type_names=self._options.included_type_names,
             excluded_type_names=self._options.excluded_type_names,
-            include_object_ids=LeakyObjectIds(),
+            include_object_ids=MemalotObjectIds(),
             # These objects may have been created since the previous iteration
             exclude_object_ids=self._get_ids(
                 chain.from_iterable(
@@ -347,26 +347,26 @@ class FilteringObjectGetter(ObjectGetter):
         )
 
     @staticmethod
-    def _get_ids(objs: Iterable[Any | None]) -> LeakyObjectIds:
+    def _get_ids(objs: Iterable[Any | None]) -> MemalotObjectIds:
         """
         Gets the IDs of the objects in the list if they are not `None`.
         """
-        return LeakyObjectIds(LeakyObjectId(id(obj)) for obj in objs if obj is not None)
+        return MemalotObjectIds(MemalotObjectId(id(obj)) for obj in objs if obj is not None)
 
 
 EXCLUDED_TYPES = {
-    LeakySnapshotManager,
-    LeakyUsageSnapshot,
-    LeakyObjects,
-    LeakyInt,
-    LeakyCount,
-    LeakyObjectId,
-    LeakyObjectIds,
-    LeakyList,
-    LeakySet,
+    MemalotSnapshotManager,
+    MemalotUsageSnapshot,
+    MemalotObjects,
+    MemalotInt,
+    MemalotCount,
+    MemalotObjectId,
+    MemalotObjectIds,
+    MemalotList,
+    MemalotSet,
     ObjectSignature,
     LeakMonitorImpl,
     LeakMonitorThread,
-    LeakyMemoryUsage,
+    MemalotMemoryUsage,
     ObjectGetter,
 }

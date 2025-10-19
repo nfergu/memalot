@@ -7,9 +7,9 @@ import numpy as np
 import pytest
 from referrers import ReferrerGraphNode
 
-from leaky import utils
-from leaky.base import ReferrerGraph, ReferrerNode
-from leaky.utils import PrintableReferrerNode
+from memalot import utils
+from memalot.base import ReferrerGraph, ReferrerNode
+from memalot.utils import PrintableReferrerNode
 from tests.utils_for_testing import create_mock, one
 
 
@@ -200,7 +200,7 @@ class TestGetModulePrefix:
     def test_get_module_prefix_found(self) -> None:
         """
         Test get_module_prefix returns the correct module prefix when called from a module
-        outside the leaky package.
+        outside the memalot package.
         """
         # When this test runs, the calling module is tests.test_utils, so we expect "tests."
         result = utils.get_module_prefix()

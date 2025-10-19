@@ -5,11 +5,11 @@ from sys import platform
 import psutil
 from pydantic.dataclasses import dataclass
 
-from leaky.base import LeakyCount
+from memalot.base import MemalotCount
 
 
 @dataclass
-class LeakyMemoryUsage:
+class MemalotMemoryUsage:
     """
     Represents memory usage information at a particular point in time.
     """
@@ -36,7 +36,7 @@ class LeakyMemoryUsage:
     """
 
 
-def get_memory_usage(iteration: LeakyCount) -> LeakyMemoryUsage:
+def get_memory_usage(iteration: MemalotCount) -> MemalotMemoryUsage:
     """
     Gets memory usage information.
     """
@@ -58,7 +58,7 @@ def get_memory_usage(iteration: LeakyCount) -> LeakyMemoryUsage:
     else:  # pragma: no cover
         peak_rss = None
     rss = memory_info.rss
-    return LeakyMemoryUsage(
+    return MemalotMemoryUsage(
         current_rss_bytes=rss,
         peak_rss_bytes=peak_rss,
         system_percent_used=p.memory_percent(memtype="rss"),

@@ -9,7 +9,7 @@ import networkx as nx
 import pytest
 from pytest_benchmark.fixture import BenchmarkFixture
 
-from leaky import leak_monitor
+from memalot import leak_monitor
 
 
 @dataclass

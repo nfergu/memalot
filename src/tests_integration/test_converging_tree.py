@@ -9,7 +9,7 @@ from typing import Optional
 
 import pytest
 
-from leaky import leak_monitor
+from memalot import leak_monitor
 from tests_integration.utils import (
     assert_iteration_count,
     assert_object_details_types,

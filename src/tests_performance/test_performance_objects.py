@@ -10,7 +10,7 @@ from typing import Any
 import pytest
 from pytest_benchmark.fixture import BenchmarkFixture
 
-from leaky import leak_monitor
+from memalot import leak_monitor
 
 
 class TypeA:
@@ -139,7 +139,6 @@ class TestMassObjectCreationPerformance:
         """
 
         def run_object_creation() -> None:
-
             # Create 500,000 tuples per iteration for a total of 1 million across 2 iterations
             create_tuples(500_000)
             create_tuples(500_000)

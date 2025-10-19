@@ -1,5 +1,5 @@
 """
-The public api of Leaky. Functions in this module are imported into the main
+The public api of Memalot. Functions in this module are imported into the main
 `__init__.py` file, along with the interfaces defined in `interface.py`.
 """
 
@@ -7,15 +7,15 @@ import functools
 from pathlib import Path
 from typing import AbstractSet, Any, Callable, Optional, ParamSpec, TypeVar, overload
 
-from leaky.interface import LeakMonitor, Stoppable
-from leaky.monitors import FilteringObjectGetter, LeakMonitorImpl, LeakMonitorThread
-from leaky.objects import gc_and_get_objects
-from leaky.options import Options
-from leaky.output import RichOutput, get_output_writer
-from leaky.reports import get_report_writer
-from leaky.snapshots import LeakySnapshotManager
-from leaky.themes import FUNCTION_NAME
-from leaky.utils import pluralize
+from memalot.interface import LeakMonitor, Stoppable
+from memalot.monitors import FilteringObjectGetter, LeakMonitorImpl, LeakMonitorThread
+from memalot.objects import gc_and_get_objects
+from memalot.options import Options
+from memalot.output import RichOutput, get_output_writer
+from memalot.reports import get_report_writer
+from memalot.snapshots import MemalotSnapshotManager
+from memalot.themes import FUNCTION_NAME
+from memalot.utils import pluralize
 
 
 def start_leak_monitoring(
@@ -49,7 +49,7 @@ def start_leak_monitoring(
 
     A memory leak report is printed to the console every `max_object_lifetime` seconds.
 
-    The `warmup_time` parameter can be changed to control how long Leaky will wait before
+    The `warmup_time` parameter can be changed to control how long Memalot will wait before
     starting to look for leaks. For example, if the program being monitored creates a lot
     of data on startup, this can be used to ignore that data. This defaults to
     `max_object_lifetime`.
@@ -127,7 +127,7 @@ def start_leak_monitoring(
     :param report_directory: The directory to write the report data to. Individual report data
         is written to a subdirectory of this directory.
         If this is `None` (the default), the default directory will be used. This is the
-        `.leaky/reports` directory in the user's home directory.
+        `.memalot/reports` directory in the user's home directory.
         To turn off saving of reports entirely, use the `save_reports` option.
 
     :param str_func: A function for outputting the string representation of an object.
@@ -187,10 +187,10 @@ def start_leak_monitoring(
     )
     writer = get_output_writer(options=options)
     report_writer = get_report_writer(options=options)
-    all_objects_manager = LeakySnapshotManager(
+    all_objects_manager = MemalotSnapshotManager(
         report_id=report_writer.report_id,
     )
-    new_objects_manager = LeakySnapshotManager(
+    new_objects_manager = MemalotSnapshotManager(
         report_id=report_writer.report_id,
     )
     object_getter = FilteringObjectGetter(
@@ -211,7 +211,7 @@ def start_leak_monitoring(
     leak_monitor_thread.start()
     writer.write(
         RichOutput(
-            f"Leaky is performing time-based leak monitoring. After a warmup period of"
+            f"Memalot is performing time-based leak monitoring. After a warmup period of"
             f" {warmup_time} seconds, objects surviving for more than {max_object_lifetime} "
             f"seconds will be identified as potential leaks."
         )
@@ -405,7 +405,7 @@ def leak_monitor(
     :param report_directory: The directory to write the report data to. Individual report data
         is written to a subdirectory of this directory.
         If this is `None` (the default), the default directory will be used. This is the
-        `.leaky/reports` directory in the user's home directory.
+        `.memalot/reports` directory in the user's home directory.
         To turn off saving of reports entirely, use the `save_reports` option.
 
     :param str_func: A function for outputting the string representation of an object.
@@ -466,13 +466,13 @@ def leak_monitor(
         )
 
         @functools.wraps(target_func)
-        def leaky_decorator_inner_wrapper(
-            *leaky_decorator_inner_args: P.args, **leaky_decorator_inner_kwargs: P.kwargs
+        def memalot_decorator_inner_wrapper(
+            *memalot_decorator_inner_args: P.args, **memalot_decorator_inner_kwargs: P.kwargs
         ) -> R:
             with monitor:
-                return target_func(*leaky_decorator_inner_args, **leaky_decorator_inner_kwargs)
+                return target_func(*memalot_decorator_inner_args, **memalot_decorator_inner_kwargs)
 
-        return leaky_decorator_inner_wrapper
+        return memalot_decorator_inner_wrapper
 
     if func is None:
         # Called with parentheses: @leak_monitor()
@@ -609,7 +609,7 @@ def create_leak_monitor(
     :param report_directory: The directory to write the report data to. Individual report data
         is written to a subdirectory of this directory.
         If this is `None` (the default), the default directory will be used. This is the
-        `.leaky/reports` directory in the user's home directory.
+        `.memalot/reports` directory in the user's home directory.
         To turn off saving of reports entirely, use the `save_reports` option.
 
     :param str_func: A function for outputting the string representation of an object.
@@ -669,7 +669,7 @@ def create_leak_monitor(
     )
     writer = get_output_writer(options=options)
     report_writer = get_report_writer(options=options)
-    snapshot_manager = LeakySnapshotManager(
+    snapshot_manager = MemalotSnapshotManager(
         report_id=report_writer.report_id,
     )
     object_getter = FilteringObjectGetter(
@@ -690,7 +690,7 @@ def create_leak_monitor(
     if function_name is not None:
         writer.write(
             RichOutput(
-                f"Leaky is performing leak monitoring for the "
+                f"Memalot is performing leak monitoring for the "
                 f"[{FUNCTION_NAME}]{function_name}[/{FUNCTION_NAME}] function. "
                 f"After {warmup_calls} warmup {pluralize('call', min_object_age_calls)}, "
                 f"objects that are created while this function is being called and are still alive "
@@ -701,7 +701,7 @@ def create_leak_monitor(
     else:
         writer.write(
             RichOutput(
-                f"Leaky is performing leak monitoring using a context manager. "
+                f"Memalot is performing leak monitoring using a context manager. "
                 f"After {warmup_calls} warmup {pluralize('call', min_object_age_calls)}, objects "
                 f"that are created while the context manager is being called and are still "
                 f"alive after {min_object_age_calls} {pluralize('call', min_object_age_calls)} "

@@ -8,7 +8,7 @@ from typing import Any
 
 import pytest
 
-from leaky import leak_monitor
+from memalot import leak_monitor
 
 
 class LeakedObject:
@@ -18,7 +18,7 @@ class LeakedObject:
 output_chunks = []
 
 
-class LeakyObject:
+class MemalotObject:
     def __init__(self) -> None:
         self._data: list[Any] = []
 
@@ -46,17 +46,17 @@ class TestOutput:
         information. We can't test the exact output, but we can check the rough format.
         """
         # ruff: noqa: W291
-        leaky_object = LeakyObject()
+        memalot_object = MemalotObject()
 
         for _ in range(2):
-            leaky_object.add_data()
+            memalot_object.add_data()
 
         expected_chunks = [
-            "Leaky is performing leak monitoring for the add_data function",
-            "Leaky Report (iteration 1) ",
+            "Memalot is performing leak monitoring for the add_data function",
+            "Memalot Report (iteration 1) ",
             "This is a warmup iteration. Reports will be available from the next iteration.",
-            "End of Leaky Report (iteration 1)",
-            "Leaky Report (iteration 2)",
+            "End of Memalot Report (iteration 1)",
+            "Memalot Report (iteration 2)",
             """
              Possible New Leaks (iteration 2)              
 ╭─────────────────────────────────────────────────┬───────╮
@@ -65,9 +65,9 @@ class TestOutput:
 │ tests_integration.test_integration.LeakedObject │     1 │
 ╰─────────────────────────────────────────────────┴───────╯
 """,
-            "Leaky is generating object details. This may take some time...",
+            "Memalot is generating object details. This may take some time...",
             "Details for tests_integration.test_integration.LeakedObject",
-            "End of Leaky Report (iteration 2)",
+            "End of Memalot Report (iteration 2)",
         ]
 
         for output_chunk, expected_chunk in zip(output_chunks, expected_chunks, strict=True):

@@ -2,7 +2,7 @@ from typing import Callable, Generator, Tuple
 
 import pytest
 
-from leaky.base import ApproximateSize, CachingIterable, ObjectSignature
+from memalot.base import ApproximateSize, CachingIterable, ObjectSignature
 
 _NUM_SAME_ID_ATTEMPTS = 100
 

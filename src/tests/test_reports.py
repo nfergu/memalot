@@ -10,11 +10,11 @@ from pytest_mock import MockerFixture
 from referrers import ReferrerGraphNode
 from rich.console import Console, RenderableType
 
-from leaky import reports
-from leaky.base import ApproximateSize, CachingIterable
-from leaky.memory import LeakyMemoryUsage
-from leaky.options import Options
-from leaky.reports import (
+from memalot import reports
+from memalot.base import ApproximateSize, CachingIterable
+from memalot.memory import MemalotMemoryUsage
+from memalot.options import Options
+from memalot.reports import (
     FileReportReader,
     FileReportWriter,
     LeakSummary,
@@ -29,8 +29,8 @@ from leaky.reports import (
     get_memory_usage_output,
     get_report_writer,
 )
-from leaky.themes import DEFAULT_RICH_THEME
-from leaky.utils import PrintableReferrerNode, convert_graph_nodes
+from memalot.themes import DEFAULT_RICH_THEME
+from memalot.utils import PrintableReferrerNode, convert_graph_nodes
 
 
 @pytest.fixture(name="sample_report_metadata")
@@ -313,7 +313,7 @@ class TestObjectDetails:
         """
         Test that ObjectDetails serializes correctly when referrer_graph is None.
         """
-        from leaky.base import ApproximateSize
+        from memalot.base import ApproximateSize
 
         object_details = ObjectDetails(
             object_id=42,
@@ -345,7 +345,7 @@ class TestReportIteration:
         renderables = list(sample_report_iteration.to_renderables())
         iteration_str = _get_renderables_as_string(renderables)
         expected_header = (
-            "╭─────────── Leaky Report (iteration 2) ────────────╮\n"
+            "╭────────── Memalot Report (iteration 2) ───────────╮\n"
             "│                                                   │\n"
             "│               Report ID: abcd-1234                │\n"
             "│ Memory used: 0.2 MiB (+0.000488 MiB) / 12.34% sys │\n"
@@ -353,7 +353,7 @@ class TestReportIteration:
             "│                                                   │\n"
             "╰───────────────────────────────────────────────────╯\n"
         )
-        expected_footer = "End of Leaky Report (iteration 2)\n"
+        expected_footer = "End of Memalot Report (iteration 2)\n"
         assert expected_header in iteration_str
         assert expected_footer in iteration_str
         assert "Possible New Leaks (iteration 2)" in iteration_str
@@ -438,7 +438,7 @@ class TestFileReportWriter:
         sample_report_iteration: ReportIteration,
     ) -> None:
         root = tmp_path
-        report_dir = root / f"leaky_report_{sample_report_metadata.report_id}"
+        report_dir = root / f"memalot_report_{sample_report_metadata.report_id}"
         report_dir.mkdir(parents=True, exist_ok=False)
 
         writer = FileReportWriter(report_dir, sample_report_metadata)
@@ -475,7 +475,7 @@ class TestFileReportReader:
         sample_report_iteration: ReportIteration,
     ) -> Path:
         root = tmp_path
-        report_dir = root / f"leaky_report_{sample_report_metadata.report_id}"
+        report_dir = root / f"memalot_report_{sample_report_metadata.report_id}"
         report_dir.mkdir(parents=True, exist_ok=False)
         writer = FileReportWriter(report_dir, sample_report_metadata)
         # Write multiple iterations
@@ -552,7 +552,7 @@ class TestGetReportWriter:
 
         report_writer = get_report_writer(options)
 
-        report_dirs = list(report_directory.glob("leaky_report_*"))
+        report_dirs = list(report_directory.glob("memalot_report_*"))
         assert len(report_dirs) == 1
         actual_report_dir = report_dirs[0]
 
@@ -592,7 +592,7 @@ class TestGetReportWriter:
         options = Options(report_directory=report_directory, save_reports=True)
 
         # Create a directory that will cause a collision
-        collision_dir = report_directory / "leaky_report_collision-id"
+        collision_dir = report_directory / "memalot_report_collision-id"
         collision_dir.mkdir(parents=True)
 
         # Mock _generate_report_id to return the same ID twice, then a different one
@@ -608,11 +608,11 @@ class TestGetReportWriter:
         assert mock_generate_report_id.call_count == 3
 
         # Should create directory with the unique ID (plus the collision directory)
-        report_dirs = list(report_directory.glob("leaky_report_*"))
+        report_dirs = list(report_directory.glob("memalot_report_*"))
         assert len(report_dirs) == 2  # collision-id and unique-id
         report_dir_names = {d.name for d in report_dirs}
-        assert "leaky_report_collision-id" in report_dir_names
-        assert "leaky_report_unique-id" in report_dir_names
+        assert "memalot_report_collision-id" in report_dir_names
+        assert "memalot_report_unique-id" in report_dir_names
 
     def test_get_report_writer_default_directory(self) -> None:
         """
@@ -627,10 +627,10 @@ class TestGetReportWriter:
         assert report_writer.report_id is not None
 
         # Verify the report was written to the default directory
-        default_report_root = Path.home() / ".leaky" / "reports"
+        default_report_root = Path.home() / ".memalot" / "reports"
         assert default_report_root.exists()
 
-        report_dirs = list(default_report_root.glob(f"leaky_report_{report_writer.report_id}"))
+        report_dirs = list(default_report_root.glob(f"memalot_report_{report_writer.report_id}"))
         assert len(report_dirs) == 1
         actual_report_dir = report_dirs[0]
 
@@ -672,14 +672,14 @@ class TestGetMemoryUsageOutput:
         """
         Test get_memory_usage_output with both previous and new MemoryUsage objects.
         """
-        previous = LeakyMemoryUsage(
+        previous = MemalotMemoryUsage(
             current_rss_bytes=1000,
             peak_rss_bytes=1500,
             system_percent_used=10.0,
             iteration_number=1,
         )
 
-        new = LeakyMemoryUsage(
+        new = MemalotMemoryUsage(
             current_rss_bytes=1200,
             peak_rss_bytes=1800,
             system_percent_used=12.0,
@@ -700,7 +700,7 @@ class TestGetMemoryUsageOutput:
         """
         Test get_memory_usage_output when previous is None.
         """
-        new = LeakyMemoryUsage(
+        new = MemalotMemoryUsage(
             current_rss_bytes=1200,
             peak_rss_bytes=1800,
             system_percent_used=12.0,
@@ -721,14 +721,14 @@ class TestGetMemoryUsageOutput:
         """
         Test get_memory_usage_output when peak_rss_bytes is None.
         """
-        previous = LeakyMemoryUsage(
+        previous = MemalotMemoryUsage(
             current_rss_bytes=1000,
             peak_rss_bytes=None,
             system_percent_used=10.0,
             iteration_number=1,
         )
 
-        new = LeakyMemoryUsage(
+        new = MemalotMemoryUsage(
             current_rss_bytes=1200,
             peak_rss_bytes=None,
             system_percent_used=12.0,

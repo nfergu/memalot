@@ -1,5 +1,5 @@
 """
-Public interfaces used in leaky. These are imported into the main `__init__.py` file.
+Public interfaces used in memalot. These are imported into the main `__init__.py` file.
 """
 
 from abc import ABC, abstractmethod

@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 from _pytest.capture import CaptureFixture
 
-from leaky.cli import entrypoint
+from memalot.cli import entrypoint
 
 
 class TestListReports:
@@ -151,13 +151,13 @@ class TestPrintReports:
         # Assert
         assert result == 0
         captured = capsys.readouterr()
-        assert "Leaky Report (iteration 3)" in captured.out
+        assert "Memalot Report (iteration 3)" in captured.out
         assert "Possible New Leaks (iteration 3)" in captured.out
         assert "Object Type" in captured.out
         assert "Count" in captured.out
-        assert "Details for __main__.LeakyObject" in captured.out
+        assert "Details for __main__.MemalotObject" in captured.out
         assert "Deep size (estimated): ~1.4 KiB" in captured.out
-        assert "End of Leaky Report (iteration 3)" in captured.out
+        assert "End of Memalot Report (iteration 3)" in captured.out
 
     def test_print_no_leaks_message(
         self, capsys: CaptureFixture[str], test_reports_dir: Path
@@ -205,12 +205,12 @@ class TestPrintReports:
         # Assert
         assert result == 0
         captured = capsys.readouterr()
-        assert "Leaky Report (iteration 2)" in captured.out
-        assert "Leaky Report (iteration 3)" in captured.out
+        assert "Memalot Report (iteration 2)" in captured.out
+        assert "Memalot Report (iteration 3)" in captured.out
         assert "Possible New Leaks (iteration 2)" in captured.out
         assert "Possible New Leaks (iteration 3)" in captured.out
-        assert "End of Leaky Report (iteration 2)" in captured.out
-        assert "End of Leaky Report (iteration 3)" in captured.out
+        assert "End of Memalot Report (iteration 2)" in captured.out
+        assert "End of Memalot Report (iteration 3)" in captured.out
 
     def test_print_filter_types(self, capsys: CaptureFixture[str], test_reports_dir: Path) -> None:
         """
@@ -232,7 +232,7 @@ class TestPrintReports:
         assert result == 0
         captured = capsys.readouterr()
         assert "Possible New Leaks (iteration 3)" in captured.out
-        assert "Details for __main__.LeakyObject" not in captured.out
+        assert "Details for __main__.MemalotObject" not in captured.out
         assert "Details for builtins.list" in captured.out
 
     def test_print_summary_only(self, capsys: CaptureFixture[str], test_reports_dir: Path) -> None:

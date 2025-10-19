@@ -4,8 +4,15 @@ from rich.console import Console, RenderableType
 from rich.console import NewLine as RichNewLine
 from rich.text import Text
 
-from leaky.options import Options
-from leaky.output import NewBlock, NewLine, Output, RichConsoleWriter, RichOutput, get_output_writer
+from memalot.options import Options
+from memalot.output import (
+    NewBlock,
+    NewLine,
+    Output,
+    RichConsoleWriter,
+    RichOutput,
+    get_output_writer,
+)
 from tests.utils_for_testing import create_mock
 
 

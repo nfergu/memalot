@@ -2,8 +2,8 @@ from typing import Any, Callable, Type
 
 import pytest
 
-from leaky.base import LeakyObjectIds
-from leaky.objects import filter_objects
+from memalot.base import MemalotObjectIds
+from memalot.objects import filter_objects
 
 
 class _CustomA:
@@ -156,8 +156,8 @@ class TestFilterObjects:
             excluded_types=excluded_types,
             included_type_names=included_type_names,
             excluded_type_names=excluded_type_names,
-            include_object_ids=LeakyObjectIds(include_ids),
-            exclude_object_ids=LeakyObjectIds(exclude_ids),
+            include_object_ids=MemalotObjectIds(include_ids),
+            exclude_object_ids=MemalotObjectIds(exclude_ids),
         )
 
         assert result == expected
@@ -190,8 +190,8 @@ class TestFilterObjects:
             excluded_types=set(),  # Don't exclude _CustomA
             included_type_names=set(),
             excluded_type_names=set(),
-            include_object_ids=LeakyObjectIds(),
-            exclude_object_ids=LeakyObjectIds(),
+            include_object_ids=MemalotObjectIds(),
+            exclude_object_ids=MemalotObjectIds(),
         )
 
         # Both the closure cell and the captured object should be present
@@ -204,8 +204,8 @@ class TestFilterObjects:
             excluded_types={_CustomA},  # Exclude _CustomA
             included_type_names=set(),
             excluded_type_names=set(),
-            include_object_ids=LeakyObjectIds(),
-            exclude_object_ids=LeakyObjectIds(),
+            include_object_ids=MemalotObjectIds(),
+            exclude_object_ids=MemalotObjectIds(),
         )
 
         # Neither the closure cell nor the captured object should be present
@@ -220,7 +220,7 @@ def test_gc_and_get_objects() -> None:
     This is just a smoke test. Most testing of the underlying functionality is done in
     the tests for `get_objects`.
     """
-    from leaky.objects import gc_and_get_objects
+    from memalot.objects import gc_and_get_objects
 
     result = gc_and_get_objects(max_untracked_search_depth=1)
 

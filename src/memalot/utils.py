@@ -9,8 +9,8 @@ import networkx as nx
 from referrers import ReferrerGraphNode
 from rich.markup import escape
 
-from leaky.base import ReferrerGraph, ReferrerNode
-from leaky.themes import (
+from memalot.base import ReferrerGraph, ReferrerNode
+from memalot.themes import (
     MEMORY_ABSOLUTE,
     OBJECT_ID,
     REFERRER_NAME,
@@ -20,7 +20,7 @@ from leaky.themes import (
 
 LOG = logging.getLogger(__name__)
 
-_PACKAGE_PREFIX = "leaky"
+_PACKAGE_PREFIX = "memalot"
 
 _KIB = 1024
 _MIB = _KIB**2
@@ -85,7 +85,7 @@ def get_module_prefix() -> str | None:
     """
     Determine the module prefix from the top-level package of the calling code.
 
-    This is the first package that is not part of Leaky.
+    This is the first package that is not part of Memalot.
     """
     stack_frames = inspect.stack()
     for frame_info in stack_frames:

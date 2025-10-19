@@ -4,15 +4,15 @@ from unittest.mock import ANY, MagicMock
 import pytest
 from pytest_mock import MockerFixture
 
-from leaky.api import create_leak_monitor, leak_monitor, start_leak_monitoring
-from leaky.interface import LeakMonitor
-from leaky.monitors import LeakMonitorImpl
-from leaky.options import Options
-from leaky.output import OutputWriter
-from leaky.reports import ReportWriter
+from memalot.api import create_leak_monitor, leak_monitor, start_leak_monitoring
+from memalot.interface import LeakMonitor
+from memalot.monitors import LeakMonitorImpl
+from memalot.options import Options
+from memalot.output import OutputWriter
+from memalot.reports import ReportWriter
 from tests.utils_for_testing import create_mock
 
-_MODULE_UNDER_TEST = "leaky.api"
+_MODULE_UNDER_TEST = "memalot.api"
 
 
 @pytest.fixture(name="mock_output_writer")

@@ -1,10 +1,10 @@
 [project]
-name = "python-leaky-mcp-server"
+name = "python-memalot-mcp-server"
 version = "0.5.2"
 requires-python = "~=3.10"
-description = "MCP Server for Leaky"
+description = "MCP Server for Memalot"
 dependencies = [
     "fastmcp>=2.12",
     # TODO: Change this to a proper release, or rework how this is done when it is installed properly
-    "python-leaky @ file:///Users/neil/workspaces/leaky"
+    "python-memalot @ file:///Users/neil/workspaces/memalot"
 ]

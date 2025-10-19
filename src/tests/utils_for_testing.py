@@ -3,8 +3,8 @@ from pathlib import Path
 from typing import Any, Callable, Iterable, TypeVar, cast
 from unittest.mock import MagicMock, create_autospec
 
-from leaky import leak_monitor
-from leaky.base import ObjectGetter
+from memalot import leak_monitor
+from memalot.base import ObjectGetter
 
 _REPORT_DIR = Path(__file__).parent / "test_data" / "reports" / "v1"
 
@@ -14,13 +14,13 @@ class Cache:
         self.cache_list: list[Any] = []
 
 
-class LeakyObject:
+class MemalotObject:
     def __init__(self, size: int) -> None:
         self.payload = [1] * size
 
 
-def create_leaky_object() -> LeakyObject:
-    return LeakyObject(128)
+def create_memalot_object() -> MemalotObject:
+    return MemalotObject(128)
 
 
 # Set save_reports=True if regenerating the test data
@@ -31,7 +31,7 @@ def create_leaky_object() -> LeakyObject:
     save_reports=False,
 )
 def create_and_cache(cache: Cache) -> None:
-    cache.cache_list.append(create_leaky_object())
+    cache.cache_list.append(create_memalot_object())
 
 
 def create_leaks() -> None:

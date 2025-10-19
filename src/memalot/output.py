@@ -4,8 +4,8 @@ from typing import Iterable
 from rich.console import Console, RenderableType
 from rich.console import NewLine as RichNewLine
 
-from leaky.options import Options
-from leaky.themes import DEFAULT_RICH_THEME
+from memalot.options import Options
+from memalot.themes import DEFAULT_RICH_THEME
 
 
 class Output(ABC):

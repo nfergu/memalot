@@ -1,8 +1,8 @@
 from types import CellType
 from typing import AbstractSet, Any, Type
 
-from leaky.base import LeakyObjectIds
-from leaky.utils import get_full_type_name, get_objects
+from memalot.base import MemalotObjectIds
+from memalot.utils import get_full_type_name, get_objects
 
 
 def _is_included_type(
@@ -10,8 +10,8 @@ def _is_included_type(
     excluded_types: set[Type[Any]],
     included_type_names: AbstractSet[str],
     excluded_type_names: AbstractSet[str],
-    include_object_ids: LeakyObjectIds,
-    exclude_object_ids: LeakyObjectIds,
+    include_object_ids: MemalotObjectIds,
+    exclude_object_ids: MemalotObjectIds,
 ) -> bool:
     """
     Returns `True` if the object should be included, based on the inclusion and exclusion rules.
@@ -54,8 +54,8 @@ def filter_objects(
     excluded_types: set[Type[Any]],
     included_type_names: AbstractSet[str],
     excluded_type_names: AbstractSet[str],
-    include_object_ids: LeakyObjectIds,
-    exclude_object_ids: LeakyObjectIds,
+    include_object_ids: MemalotObjectIds,
+    exclude_object_ids: MemalotObjectIds,
 ) -> list[Any]:
     """
     Filters the provided `objects` according to a set of rules.
@@ -74,7 +74,7 @@ def filter_objects(
     :return: A new list containing the objects that satisfy the inclusion rules.
     """
     # Also exclude the IDs of the objects in the include_object_ids and exclude_object_ids lists
-    exclude_object_ids = LeakyObjectIds(
+    exclude_object_ids = MemalotObjectIds(
         exclude_object_ids
         | {id(include_object_id) for include_object_id in include_object_ids}
         | {id(exclude_object_id) for exclude_object_id in exclude_object_ids}

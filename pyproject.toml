@@ -1,5 +1,5 @@
 [project]
-name = "python-leaky"
+name = "memalot"
 version = "0.6.0"
 requires-python = "~=3.10"
 description = "Finds memory leaks in Python programs"
@@ -13,7 +13,7 @@ dependencies = [
 ]
 
 [project.scripts]
-leaky = "leaky.cli:main"
+memalot = "memalot.cli:main"
 
 [project.optional-dependencies]
 test = [
@@ -37,7 +37,7 @@ lint.select = [
 ]
     
 [tool.ruff.lint.isort]
-known-first-party = ["leaky"]
+known-first-party = ["memalot"]
 
 [tool.mypy]
 ignore_missing_imports = true
@@ -49,14 +49,14 @@ files = ["src"]
 # Coverage needs to be disabled for integration tests to work as coverage interferes with
 # the leaked objects reports.
 testpaths = ["src/tests"]
-addopts = ["--cov=leaky"]
+addopts = ["--cov=memalot"]
 markers = [
     "integration: integration (functional) tests; run with coverage off",
     "performance: performance tests using pytest-benchmark"
 ]
 
 [tool.coverage.run]
-omit = ["src/leaky/networkx_copy.py", "src/leaky/examples/**"]
+omit = ["src/memalot/networkx_copy.py", "src/memalot/examples/**"]
 
 [tool.coverage.report]
 show_missing = true

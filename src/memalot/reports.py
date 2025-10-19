@@ -16,12 +16,12 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 
-from leaky import networkx_copy
-from leaky.base import ApproximateSize, CachingIterable, ReferrerGraph
-from leaky.memory import LeakyMemoryUsage
-from leaky.options import Options
-from leaky.output import NewBlock, Output
-from leaky.themes import (
+from memalot import networkx_copy
+from memalot.base import ApproximateSize, CachingIterable, ReferrerGraph
+from memalot.memory import MemalotMemoryUsage
+from memalot.options import Options
+from memalot.output import NewBlock, Output
+from memalot.themes import (
     COUNT,
     END_OF_SECTION_TEXT,
     HEADING_BORDER,
@@ -35,14 +35,14 @@ from leaky.themes import (
     TABLE_TITLE,
     TITLE,
 )
-from leaky.utils import as_mib, as_mib_sf, convert_graph_nodes_to_printable, format_bytes
+from memalot.utils import as_mib, as_mib_sf, convert_graph_nodes_to_printable, format_bytes
 
 _CURRENT_FILE_VERSION = 1
 """
 The current file format version. Used when writing files.
 """
 
-_REPORT_DIR_PREFIX = "leaky_report_"
+_REPORT_DIR_PREFIX = "memalot_report_"
 """
 The prefix of the report directory name.
 """
@@ -366,7 +366,7 @@ class ReportIteration(Output):
             expand=False,
             padding=1,
             border_style=HEADING_BORDER,
-            title=f"[bold]Leaky Report[/bold] (iteration {self.iteration_number})",
+            title=f"[bold]Memalot Report[/bold] (iteration {self.iteration_number})",
             title_align="center",
         )
 
@@ -390,7 +390,7 @@ class ReportIteration(Output):
         yield NewBlock("")
 
         if self.leak_summary.type_summaries:
-            yield "Leaky is generating object details. This may take some time..."
+            yield "Memalot is generating object details. This may take some time..."
             yield NewBlock("")
 
         for object_details in self.object_details_list:
@@ -400,7 +400,7 @@ class ReportIteration(Output):
             yield NewBlock("")
 
         yield (
-            f"[{END_OF_SECTION_TEXT}]End of Leaky Report "
+            f"[{END_OF_SECTION_TEXT}]End of Memalot Report "
             f"(iteration {self.iteration_number})[/{END_OF_SECTION_TEXT}]"
         )
 
@@ -599,7 +599,7 @@ def get_report_writer(options: Options) -> ReportWriter:
     Gets an report writer for the given options.
 
     If the report directory is not specified, the default report root is used.
-    The report root is a directory in the user's home directory called `.leaky/reports`.
+    The report root is a directory in the user's home directory called `.memalot/reports`.
     """
     start_time = datetime.now(timezone.utc)
     report_id = _generate_report_id(start_time)
@@ -669,7 +669,7 @@ def filter_iteration_by_types(
 
 
 def get_memory_usage_output(
-    previous: LeakyMemoryUsage | None, new: LeakyMemoryUsage
+    previous: MemalotMemoryUsage | None, new: MemalotMemoryUsage
 ) -> MemoryUsageOutput:
     """
     Gets a `Output` object representing the memory usage. This includes the difference
@@ -712,7 +712,7 @@ def _get_default_report_root() -> Path:
     """
     Gets the default report root.
     """
-    return Path.home() / ".leaky" / "reports"
+    return Path.home() / ".memalot" / "reports"
 
 
 def _generate_report_id(start_time: datetime) -> str:

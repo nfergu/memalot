@@ -1,6 +1,6 @@
-from leaky.base import LeakyCount
-from leaky.memory import (
-    LeakyMemoryUsage,
+from memalot.base import MemalotCount
+from memalot.memory import (
+    MemalotMemoryUsage,
     get_memory_usage,
 )
 
@@ -14,11 +14,11 @@ class TestGetMemoryUsage:
         """
         Test get_memory_usage.
         """
-        result = get_memory_usage(LeakyCount(11))
+        result = get_memory_usage(MemalotCount(11))
 
         # There isn't much we can check here, but we can at least make sure
         # the result is a MemoryUsage object and has the expected fields.
-        assert isinstance(result, LeakyMemoryUsage)
+        assert isinstance(result, MemalotMemoryUsage)
         assert isinstance(result.current_rss_bytes, int)
         assert result.current_rss_bytes > 0
         assert isinstance(result.system_percent_used, float)

@@ -12,16 +12,16 @@ from rich import box
 from rich.console import Console
 from rich.table import Table
 
-from leaky.options import Options
-from leaky.output import get_output_writer
-from leaky.reports import (
+from memalot.options import Options
+from memalot.output import get_output_writer
+from memalot.reports import (
     FullReport,
     ReportIteration,
     ReportSummary,
     filter_iteration_by_types,
     get_report_reader,
 )
-from leaky.themes import (
+from memalot.themes import (
     CLI_ITERATIONS_COLUMN,
     CLI_LIST_REPORT_ID,
     CLI_NO_REPORTS_MESSAGE,
@@ -152,7 +152,7 @@ def entrypoint(sys_args: List[str]) -> int:
     """
     Main CLI entry point.
     """
-    parser = argparse.ArgumentParser(description="Leaky memory reports CLI", prog="leaky")
+    parser = argparse.ArgumentParser(description="Memalot memory reports CLI", prog="memalot")
 
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
@@ -164,7 +164,7 @@ def entrypoint(sys_args: List[str]) -> int:
     list_parser.add_argument(
         "--report-directory",
         type=str,
-        help="Directory to search for reports (default: ~/.leaky/reports)",
+        help="Directory to search for reports (default: ~/.memalot/reports)",
     )
     list_parser.add_argument(
         "--force-terminal",
@@ -188,7 +188,7 @@ def entrypoint(sys_args: List[str]) -> int:
     print_parser.add_argument(
         "--report-directory",
         type=str,
-        help="Directory to search for reports (default: ~/.leaky/reports)",
+        help="Directory to search for reports (default: ~/.memalot/reports)",
     )
     print_parser.add_argument(
         "--force-terminal",

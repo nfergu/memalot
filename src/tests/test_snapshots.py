@@ -10,13 +10,13 @@ from networkx.classes import DiGraph
 from pytest_mock import MockerFixture
 from referrers import ReferrerGraph, ReferrerGraphNode
 
-from leaky.base import ApproximateSize, LeakyCount
-from leaky.base import ReferrerGraph as MyReferrerGraph
-from leaky.memory import LeakyMemoryUsage
-from leaky.monitors import FilteringObjectGetter
-from leaky.options import Options
-from leaky.reports import LeakSummary, TypeSummary
-from leaky.snapshots import LeakyObjects, LeakySnapshotManager, LeakyUsageSnapshot
+from memalot.base import ApproximateSize, MemalotCount
+from memalot.base import ReferrerGraph as MyReferrerGraph
+from memalot.memory import MemalotMemoryUsage
+from memalot.monitors import FilteringObjectGetter
+from memalot.options import Options
+from memalot.reports import LeakSummary, TypeSummary
+from memalot.snapshots import MemalotObjects, MemalotSnapshotManager, MemalotUsageSnapshot
 from tests.utils_for_testing import FixedObjectGetter, create_mock
 
 _NUM_SAME_ID_ATTEMPTS = 100
@@ -108,7 +108,7 @@ def _default_options_fixture() -> Options:
 @pytest.fixture(name="diff_objects")
 def _diff_objects_fixture() -> list[object]:
     """
-    Provides objects for creating LeakyUsageDiff instances.
+    Provides objects for creating MemalotUsageDiff instances.
     """
     return [
         CustomObject("diff1"),
@@ -120,11 +120,11 @@ def _diff_objects_fixture() -> list[object]:
 
 
 @pytest.fixture(name="test_memory_usage")
-def _test_memory_usage_fixture() -> LeakyMemoryUsage:
+def _test_memory_usage_fixture() -> MemalotMemoryUsage:
     """
     Provides a MemoryUsage instance for testing.
     """
-    return LeakyMemoryUsage(
+    return MemalotMemoryUsage(
         current_rss_bytes=1024000,
         peak_rss_bytes=2048000,
         system_percent_used=25.5,
@@ -132,18 +132,18 @@ def _test_memory_usage_fixture() -> LeakyMemoryUsage:
     )
 
 
-class TestLeakyUsageDiff:
+class TestMemalotUsageDiff:
     """
-    Tests for the `LeakyUsageDiff` class.
+    Tests for the `MemalotUsageDiff` class.
     """
 
     def test_with_empty_list(self, default_options: Options) -> None:
         """
-        Tests that LeakyUsageDiff works with an empty object list.
+        Tests that MemalotUsageDiff works with an empty object list.
         """
-        diff = LeakyObjects([])
+        diff = MemalotObjects([])
         assert len(diff) == 0
-        summary = diff.get_leak_summary(iteration=LeakyCount(4), options=default_options)
+        summary = diff.get_leak_summary(iteration=MemalotCount(4), options=default_options)
         assert summary == LeakSummary(
             iteration=4,
             type_summaries=[],
@@ -158,7 +158,7 @@ class TestLeakyUsageDiff:
         self, default_options: Options, compute_size: bool, module_prefixes: set[str] | None
     ) -> None:
         """
-        Tests that LeakyUsageDiff works with multiple objects of different types.
+        Tests that MemalotUsageDiff works with multiple objects of different types.
         """
         default_options = replace(
             default_options,
@@ -185,9 +185,9 @@ class TestLeakyUsageDiff:
             "string3",
             "string4",  # 4 strings
         ]
-        diff = LeakyObjects(objects)
+        diff = MemalotObjects(objects)
 
-        summary = diff.get_leak_summary(iteration=LeakyCount(4), options=default_options)
+        summary = diff.get_leak_summary(iteration=MemalotCount(4), options=default_options)
         actuals = summary.type_summaries
         assert summary == LeakSummary(
             iteration=4,
@@ -308,7 +308,7 @@ class TestLeakyUsageDiff:
             [3, 4],  # 2 lists
             {"key": "value"},  # 1 dict
         ]
-        diff = LeakyObjects(objects)
+        diff = MemalotObjects(objects)
 
         # Set max_object_details high enough to include all objects
         high_limit_options = Options(max_object_details=100)
@@ -351,7 +351,7 @@ class TestLeakyUsageDiff:
 
     def test_with_max_object_details_limit(self, default_options: Options) -> None:
         """
-        Tests that LeakyUsageDiff respects max_object_details and returns
+        Tests that MemalotUsageDiff respects max_object_details and returns
         the correct subset of objects.
         """
         mock_referrer_graph = create_mock(spec=ReferrerGraph)
@@ -375,7 +375,7 @@ class TestLeakyUsageDiff:
         for i in range(4):
             objects.append(f"string{i}")
 
-        diff = LeakyObjects(objects)
+        diff = MemalotObjects(objects)
 
         # Set max_object_details to 10 (less than total 28 objects)
         limited_options = Options(max_object_details=10)
@@ -410,7 +410,7 @@ class TestLeakyUsageDiff:
 
     def test_with_check_referrers_false(self, default_options: Options) -> None:
         """
-        Tests that LeakyUsageDiff works correctly when check_referrers is False.
+        Tests that MemalotUsageDiff works correctly when check_referrers is False.
         """
         mock_get_referrers = MagicMock()
 
@@ -420,7 +420,7 @@ class TestLeakyUsageDiff:
             {"key": "value"},
             "test_string",
         ]
-        diff = LeakyObjects(objects)
+        diff = MemalotObjects(objects)
 
         no_referrers_options = Options(check_referrers=False)
 
@@ -457,7 +457,7 @@ class TestLeakyUsageDiff:
 
     def test_with_object_str_exception(self, default_options: Options) -> None:
         """
-        Tests that LeakyUsageDiff handles objects that raise exceptions when getting string
+        Tests that MemalotUsageDiff handles objects that raise exceptions when getting string
         representation.
         """
 
@@ -479,7 +479,7 @@ class TestLeakyUsageDiff:
         normal_obj = CustomObject("normal")
         objects = [exception_obj, normal_obj]
 
-        diff = LeakyObjects(objects)
+        diff = MemalotObjects(objects)
 
         object_details_list = list(
             diff.generate_object_details(
@@ -512,7 +512,7 @@ class TestLeakyUsageDiff:
 
     def test_with_custom_str_func(self, default_options: Options) -> None:
         """
-        Tests that LeakyUsageDiff uses custom str_func when provided in options.
+        Tests that MemalotUsageDiff uses custom str_func when provided in options.
         """
 
         def custom_str_func(obj: Any, max_length: int) -> str:
@@ -532,7 +532,7 @@ class TestLeakyUsageDiff:
             [1, 2, 3],
             {"key": "value"},
         ]
-        diff = LeakyObjects(objects)
+        diff = MemalotObjects(objects)
 
         custom_options = Options(str_func=custom_str_func)
 
@@ -560,32 +560,32 @@ class TestLeakyUsageDiff:
 
     def test_eq_with_equal_objects(self) -> None:
         """
-        Tests that two LeakyObjects instances with equal but different object lists are equal.
+        Tests that two MemalotObjects instances with equal but different object lists are equal.
         """
         obj1 = CustomObject("test")
         obj2 = [1, 2, 3]
         objects1 = [obj1, obj2]
         objects2 = [obj1, obj2]  # Same objects, same order
-        diff1 = LeakyObjects(objects1)
-        diff2 = LeakyObjects(objects2)
+        diff1 = MemalotObjects(objects1)
+        diff2 = MemalotObjects(objects2)
         assert diff1 == diff2
 
     def test_eq_with_different_objects(self) -> None:
         """
-        Tests that two LeakyObjects instances with different objects are not equal.
+        Tests that two MemalotObjects instances with different objects are not equal.
         """
         objects1 = [CustomObject("test1"), [1, 2, 3]]
         objects2 = [CustomObject("test2"), [4, 5, 6]]
-        diff1 = LeakyObjects(objects1)
-        diff2 = LeakyObjects(objects2)
+        diff1 = MemalotObjects(objects1)
+        diff2 = MemalotObjects(objects2)
         assert diff1 != diff2
 
     def test_eq_with_wrong_type(self) -> None:
         """
-        Tests that comparing a LeakyObject instance with a string returns False.
+        Tests that comparing a MemalotObject instance with a string returns False.
         """
         objects1 = [CustomObject("test1"), [1, 2, 3]]
-        diff1 = LeakyObjects(objects1)
+        diff1 = MemalotObjects(objects1)
         assert diff1 != "diff2"
 
     def test_generate_object_details_with_function_name(self, default_options: Options) -> None:
@@ -600,14 +600,14 @@ class TestLeakyUsageDiff:
         # Add nodes with the specific names that should be replaced
         mock_networkx_graph.add_node(
             ReferrerGraphNode(
-                name="leaky_decorator_inner_wrapper.leaky_decorator_inner_args",
+                name="memalot_decorator_inner_wrapper.memalot_decorator_inner_args",
                 id=1001,
                 type="local",
             )
         )
         mock_networkx_graph.add_node(
             ReferrerGraphNode(
-                name="leaky_decorator_inner_wrapper.leaky_decorator_inner_kwargs",
+                name="memalot_decorator_inner_wrapper.memalot_decorator_inner_kwargs",
                 id=1002,
                 type="local",
             )
@@ -615,7 +615,7 @@ class TestLeakyUsageDiff:
         mock_referrer_graph.to_networkx.return_value = mock_networkx_graph
 
         objects = [CustomObject("test")]
-        diff = LeakyObjects(objects)
+        diff = MemalotObjects(objects)
 
         object_details_list = list(
             diff.generate_object_details(
@@ -642,13 +642,15 @@ class TestLeakyUsageDiff:
         assert "my_test_function kwargs" in referrer_names
 
         # The original decorator wrapper names should not be present
-        assert "leaky_decorator_inner_wrapper.leaky_decorator_inner_args" not in referrer_names
-        assert "leaky_decorator_inner_wrapper.leaky_decorator_inner_kwargs" not in referrer_names
+        assert "memalot_decorator_inner_wrapper.memalot_decorator_inner_args" not in referrer_names
+        assert (
+            "memalot_decorator_inner_wrapper.memalot_decorator_inner_kwargs" not in referrer_names
+        )
 
 
-class TestLeakyUsageSnapshot:
+class TestMemalotUsageSnapshot:
     """
-    Tests for the `LeakyUsageSnapshot` class.
+    Tests for the `MemalotUsageSnapshot` class.
     """
 
     def test_is_new_since_snapshot(self, default_options: Options) -> None:
@@ -662,7 +664,7 @@ class TestLeakyUsageSnapshot:
         builtin_objects: list[object] = [[1, 2, 3], {"a": 1}, "string"]
         mixed_objects: list[object] = custom_objects + builtin_objects
 
-        snapshot = LeakyUsageSnapshot(
+        snapshot = MemalotUsageSnapshot(
             object_getter=FixedObjectGetter(mixed_objects),
             filter_condition=None,
         )
@@ -694,7 +696,7 @@ class TestLeakyUsageSnapshot:
         builtin_objects: list[object] = [[1, 2, 3], {"a": 1}, "string"]
         mixed_objects: list[object] = custom_objects + builtin_objects
 
-        snapshot = LeakyUsageSnapshot(
+        snapshot = MemalotUsageSnapshot(
             object_getter=FixedObjectGetter(mixed_objects),
             filter_condition=None,
         )
@@ -720,31 +722,31 @@ class TestLeakyUsageSnapshot:
             pytest.param(
                 [],
                 expected := [CustomObject("new")],
-                LeakyObjects(expected),  # type: ignore[name-defined]
+                MemalotObjects(expected),  # type: ignore[name-defined]
                 id="Empty snapshot with new object",
             ),
             pytest.param(
                 [CustomObject("one")],
                 expected := [CustomObject("one")],
-                LeakyObjects(expected),  # type: ignore[name-defined]
+                MemalotObjects(expected),  # type: ignore[name-defined]
                 id="Existing snapshot with object of same value",
             ),
             pytest.param(
                 [CustomObject("old")],
                 expected := [CustomObject("new"), CustomObject("new2")],
-                LeakyObjects(expected),  # type: ignore[name-defined]
+                MemalotObjects(expected),  # type: ignore[name-defined]
                 id="Existing snapshot with multiple new objects",
             ),
             pytest.param(
                 [CustomObject("old")],
                 [],
-                LeakyObjects([]),
+                MemalotObjects([]),
                 id="Existing snapshot with no new objects",
             ),
             pytest.param(
                 [[1, 2]],
                 expected_val := [[3, 4], {"c": 3}],
-                LeakyObjects(expected_val),  # type: ignore[name-defined]
+                MemalotObjects(expected_val),  # type: ignore[name-defined]
                 id="Builtin objects",
             ),
         ],
@@ -753,18 +755,18 @@ class TestLeakyUsageSnapshot:
         self,
         objects_in_snapshot: list[object],
         new_objects: list[object],
-        expected_diff: LeakyObjects,
+        expected_diff: MemalotObjects,
         default_options: Options,
     ) -> None:
         """
         Tests the is_new_since_snapshot method with various object combinations.
         """
-        snapshot = LeakyUsageSnapshot(
+        snapshot = MemalotUsageSnapshot(
             object_getter=FixedObjectGetter(objects_in_snapshot),
             filter_condition=None,
         )
         all_objects = objects_in_snapshot + new_objects
-        diff = LeakyObjects([obj for obj in all_objects if snapshot.is_new_since_snapshot(obj)])
+        diff = MemalotObjects([obj for obj in all_objects if snapshot.is_new_since_snapshot(obj)])
 
         assert {id(obj) for obj in diff.objects} == {id(obj) for obj in expected_diff.objects}
 
@@ -789,7 +791,7 @@ class TestLeakyUsageSnapshot:
             with pytest.raises(TypeError):
                 weakref.ref(obj)
 
-        snapshot = LeakyUsageSnapshot(
+        snapshot = MemalotUsageSnapshot(
             object_getter=FixedObjectGetter(non_weak_ref_objects),
             filter_condition=None,
         )
@@ -837,7 +839,7 @@ class TestLeakyUsageSnapshot:
             with pytest.raises(TypeError):
                 weakref.ref(obj)
 
-        snapshot = LeakyUsageSnapshot(
+        snapshot = MemalotUsageSnapshot(
             object_getter=FixedObjectGetter(initial_objects),
             filter_condition=None,
         )
@@ -854,7 +856,7 @@ class TestLeakyUsageSnapshot:
         ]
 
         all_objects = initial_objects + new_objects
-        diff = LeakyObjects([obj for obj in all_objects if snapshot.is_new_since_snapshot(obj)])
+        diff = MemalotObjects([obj for obj in all_objects if snapshot.is_new_since_snapshot(obj)])
 
         assert {id(obj) for obj in diff.objects} == {id(obj) for obj in new_objects}
 
@@ -921,11 +923,11 @@ class TestLeakyUsageSnapshot:
 
         get_objects_func = MagicMock(side_effect=[original_objects, internal_machinery_objects])
 
-        snapshot = LeakyUsageSnapshot(
+        snapshot = MemalotUsageSnapshot(
             object_getter=FilteringObjectGetter(
                 get_objects_func=get_objects_func,
                 options=default_options,
-                snapshot_managers=[create_mock(LeakySnapshotManager)],
+                snapshot_managers=[create_mock(MemalotSnapshotManager)],
             ),
             filter_condition=None,
         )
@@ -959,7 +961,7 @@ class TestLeakyUsageSnapshot:
                 return "2" in obj.value or "4" in obj.value
             return False
 
-        snapshot = LeakyUsageSnapshot(
+        snapshot = MemalotUsageSnapshot(
             object_getter=FixedObjectGetter(all_objects),
             filter_condition=filter_func,
         )
@@ -981,15 +983,17 @@ class TestLeakyUsageSnapshot:
 
     def _get_snapshot_with_non_weak_ref_object1(
         self, default_options: Options
-    ) -> Tuple[LeakyUsageSnapshot, int]:
+    ) -> Tuple[MemalotUsageSnapshot, int]:
         obj = self._get_non_weak_ref_object1()
-        snapshot = LeakyUsageSnapshot(object_getter=FixedObjectGetter([obj]), filter_condition=None)
+        snapshot = MemalotUsageSnapshot(
+            object_getter=FixedObjectGetter([obj]), filter_condition=None
+        )
         return snapshot, id(obj)
 
 
-class TestLeakySnapshotManager:
+class TestMemalotSnapshotManager:
     """
-    Tests for the `LeakySnapshotManager` class.
+    Tests for the `MemalotSnapshotManager` class.
     """
 
     def test_generate_new_snapshot(self, default_options: Options) -> None:
@@ -997,7 +1001,7 @@ class TestLeakySnapshotManager:
         Tests that generate_new_snapshot creates multiple snapshots correctly from a
         new manager instance.
         """
-        manager = LeakySnapshotManager(
+        manager = MemalotSnapshotManager(
             report_id="test-snapshot-123",
         )
 
@@ -1051,7 +1055,7 @@ class TestLeakySnapshotManager:
         """
         Tests that clear_snapshots removes all snapshot data.
         """
-        manager = LeakySnapshotManager(
+        manager = MemalotSnapshotManager(
             report_id="test-clear-123",
         )
 
@@ -1075,7 +1079,7 @@ class TestLeakySnapshotManager:
         Tests that rotate_memory_usage tracks memory usage across multiple calls from a new
         manager instance.
         """
-        manager = LeakySnapshotManager(
+        manager = MemalotSnapshotManager(
             report_id="test-memory-123",
         )
 
@@ -1083,7 +1087,7 @@ class TestLeakySnapshotManager:
         assert manager.most_recent_reported_usage is None
 
         # First rotation - should return None for old usage
-        old_usage1, new_usage1 = manager.rotate_memory_usage(iteration=LeakyCount(1))
+        old_usage1, new_usage1 = manager.rotate_memory_usage(iteration=MemalotCount(1))
 
         assert old_usage1 is None
         assert new_usage1 is not None
@@ -1091,7 +1095,7 @@ class TestLeakySnapshotManager:
         assert manager.most_recent_reported_usage == new_usage1
 
         # Second rotation - should return previous usage as old
-        old_usage2, new_usage2 = manager.rotate_memory_usage(iteration=LeakyCount(2))
+        old_usage2, new_usage2 = manager.rotate_memory_usage(iteration=MemalotCount(2))
 
         assert old_usage2 == new_usage1
         assert new_usage2 is not None
@@ -1099,7 +1103,7 @@ class TestLeakySnapshotManager:
         assert manager.most_recent_reported_usage == new_usage2
 
         # Third rotation - ensure multiple rotations work
-        old_usage3, new_usage3 = manager.rotate_memory_usage(iteration=LeakyCount(3))
+        old_usage3, new_usage3 = manager.rotate_memory_usage(iteration=MemalotCount(3))
 
         assert old_usage3 == new_usage2
         assert new_usage3 is not None
@@ -1111,7 +1115,7 @@ class TestLeakySnapshotManager:
         Tests that the report_id property returns the correct report ID.
         """
         report_id = "test-property-id-456"
-        manager = LeakySnapshotManager(
+        manager = MemalotSnapshotManager(
             report_id=report_id,
         )
 
@@ -1119,14 +1123,14 @@ class TestLeakySnapshotManager:
 
     def test_snapshot_created_with_correct_parameters(self, mocker: MockerFixture) -> None:
         """
-        Tests that LeakyUsageSnapshot is created with filter_condition=None when
+        Tests that MemalotUsageSnapshot is created with filter_condition=None when
         since_snapshot=None.
         """
         mock_snapshot_init = mocker.patch(
-            "leaky.snapshots.LeakyUsageSnapshot.__init__", return_value=None
+            "memalot.snapshots.MemalotUsageSnapshot.__init__", return_value=None
         )
         mock_get_objects_func = MagicMock()
-        manager = LeakySnapshotManager(
+        manager = MemalotSnapshotManager(
             report_id="report_id",
         )
         manager.generate_new_snapshot(object_getter=mock_get_objects_func, since_snapshot=None)
@@ -1139,15 +1143,15 @@ class TestLeakySnapshotManager:
         self, mocker: MockerFixture, default_options: Options
     ) -> None:
         """
-        Tests that LeakyUsageSnapshot is created with a filter_condition when since_snapshot
+        Tests that MemalotUsageSnapshot is created with a filter_condition when since_snapshot
         is provided. The filter_condition should be the is_new_since_snapshot method of the
         since_snapshot.
         """
         mock_snapshot_init = mocker.patch(
-            "leaky.snapshots.LeakyUsageSnapshot.__init__", return_value=None
+            "memalot.snapshots.MemalotUsageSnapshot.__init__", return_value=None
         )
         mock_get_objects_func = MagicMock()
-        manager = LeakySnapshotManager(
+        manager = MemalotSnapshotManager(
             report_id="report_id",
         )
         manager.generate_new_snapshot(object_getter=mock_get_objects_func, since_snapshot=None)
@@ -1170,7 +1174,7 @@ class TestLeakySnapshotManager:
         """
         Tests that generate_new_snapshot with since_snapshot parameter is correctly applied.
         """
-        manager = LeakySnapshotManager(
+        manager = MemalotSnapshotManager(
             report_id="report_id",
         )
 
@@ -1183,7 +1187,7 @@ class TestLeakySnapshotManager:
 
 def _generate_snapshot_with_weak_ref_object(
     default_options: Options,
-) -> Tuple[LeakyUsageSnapshot, int, CustomObject]:
+) -> Tuple[MemalotUsageSnapshot, int, CustomObject]:
     """
     Helper to generate two weak-referencable objects and return a snapshot containing them.
 
@@ -1195,7 +1199,7 @@ def _generate_snapshot_with_weak_ref_object(
     # Double check that weak references can be created
     weakref.ref(gced_object)
     weakref.ref(non_gced_object)
-    snapshot = LeakyUsageSnapshot(
+    snapshot = MemalotUsageSnapshot(
         object_getter=FixedObjectGetter([gced_object, non_gced_object]),
         filter_condition=None,
     )
