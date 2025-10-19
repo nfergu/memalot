@@ -18,7 +18,7 @@ class LeakedObject:
 output_chunks = []
 
 
-class MemalotObject:
+class LeakyObject:
     def __init__(self) -> None:
         self._data: list[Any] = []
 
@@ -46,7 +46,7 @@ class TestOutput:
         information. We can't test the exact output, but we can check the rough format.
         """
         # ruff: noqa: W291
-        memalot_object = MemalotObject()
+        memalot_object = LeakyObject()
 
         for _ in range(2):
             memalot_object.add_data()

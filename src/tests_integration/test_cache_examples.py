@@ -29,10 +29,10 @@ class Cache:
     """
 
     def __init__(self) -> None:
-        self.cache_list: list["MemalotObject"] = []
+        self.cache_list: list["LeakyObject"] = []
 
 
-class MemalotObject:
+class LeakyObject:
     """
     An object with a numpy array payload.
     """
@@ -41,7 +41,7 @@ class MemalotObject:
         self.payload = np.ones(size)
 
 
-class NotMemalotObject:
+class NotLeakyObject:
     """
     An object that is not leaked.
     """
@@ -59,12 +59,12 @@ class PreviousObject:
         self.payload = np.ones(size)
 
 
-def create_memalot_object() -> MemalotObject:
+def create_leaky_object() -> LeakyObject:
     """
-    Creates a memalot object after creating a non-memalot object.
+    Creates a leaky object after creating a non-leaky object.
     """
-    _ = NotMemalotObject(128)
-    return MemalotObject(128)
+    _ = NotLeakyObject(128)
+    return LeakyObject(128)
 
 
 @pytest.mark.integration
@@ -78,9 +78,9 @@ class TestCacheExampleFunctionBased:
         Tests that the cache example with function-based monitoring generates the expected report.
 
         This test verifies that:
-        - MemalotObjects added to a cache are properly detected as leaks
-        - Each iteration reports exactly 1 new MemalotObject
-        - Type summaries contain only MemalotObject and numpy.ndarray types
+        - LeakyObjects added to a cache are properly detected as leaks
+        - Each iteration reports exactly 1 new LeakyObject
+        - Type summaries contain only LeakyObject and numpy.ndarray types
         - Referrer graphs correctly identify the cache as the root
         """
 
@@ -89,7 +89,7 @@ class TestCacheExampleFunctionBased:
             report_directory=tmp_path,
         )
         def create_and_cache(cache: Cache) -> None:
-            cache.cache_list.append(create_memalot_object())
+            cache.cache_list.append(create_leaky_object())
 
         cache = Cache()
 
@@ -106,14 +106,14 @@ class TestCacheExampleFunctionBased:
         assert iteration_1.iteration_number == 1
         assert_warmup_iteration(iteration=iteration_1)
 
-        # Iteration 2: exactly 1 new MemalotObject and 1 ndarray
+        # Iteration 2: exactly 1 new LeakyObject and 1 ndarray
         iteration_2 = full_report.iterations[1]
         assert iteration_2.iteration_number == 2
 
         # Check type summaries
         type_summaries = iteration_2.leak_summary.type_summaries
         expected_types = {
-            "tests_integration.test_cache_examples.MemalotObject",
+            "tests_integration.test_cache_examples.LeakyObject",
             "numpy.ndarray",
         }
         expected_counts = {1}
@@ -129,12 +129,12 @@ class TestCacheExampleFunctionBased:
             object_details_list=object_details_list, expected_types=expected_types
         )
 
-        # Verify MemalotObject
+        # Verify LeakyObject
         assert_object_type_details(
             object_details_list=object_details_list,
-            object_type="tests_integration.test_cache_examples.MemalotObject",
+            object_type="tests_integration.test_cache_examples.LeakyObject",
             expected_count=1,
-            expected_target_names={"MemalotObject (object)"},
+            expected_target_names={"LeakyObject (object)"},
         )
 
         # Verify ndarray
@@ -156,7 +156,7 @@ class TestCacheExampleFunctionBased:
             expected_root_names=expected_root_names,
         )
 
-        # Iteration 3: exactly 1 new MemalotObject and 1 ndarray (same as iteration 2)
+        # Iteration 3: exactly 1 new LeakyObject and 1 ndarray (same as iteration 2)
         iteration_3 = full_report.iterations[2]
         assert iteration_3.iteration_number == 3
 
@@ -179,15 +179,15 @@ class TestCacheExampleContextManager:
         Tests that the cache example with context manager generates the expected report.
 
         This test verifies that:
-        - MemalotObjects added to a cache are properly detected as leaks
-        - Each iteration reports exactly 1 new MemalotObject
-        - Type summaries contain only MemalotObject and numpy.ndarray types
+        - LeakyObjects added to a cache are properly detected as leaks
+        - Each iteration reports exactly 1 new LeakyObject
+        - Type summaries contain only LeakyObject and numpy.ndarray types
         - Referrer graphs correctly identify the cache as the root
         """
 
         # given: a create_and_cache function and a leak monitor context manager
         def create_and_cache(cache: Cache) -> None:
-            cache.cache_list.append(create_memalot_object())
+            cache.cache_list.append(create_leaky_object())
 
         cache = Cache()
         monitor = create_leak_monitor(
@@ -209,14 +209,14 @@ class TestCacheExampleContextManager:
         assert iteration_1.iteration_number == 1
         assert_warmup_iteration(iteration=iteration_1)
 
-        # Iteration 2: exactly 1 new MemalotObject and 1 ndarray
+        # Iteration 2: exactly 1 new LeakyObject and 1 ndarray
         iteration_2 = full_report.iterations[1]
         assert iteration_2.iteration_number == 2
 
         # Check type summaries
         type_summaries = iteration_2.leak_summary.type_summaries
         expected_types = {
-            "tests_integration.test_cache_examples.MemalotObject",
+            "tests_integration.test_cache_examples.LeakyObject",
             "numpy.ndarray",
         }
         expected_counts = {1}
@@ -232,12 +232,12 @@ class TestCacheExampleContextManager:
             object_details_list=object_details_list, expected_types=expected_types
         )
 
-        # Verify MemalotObject
+        # Verify LeakyObject
         assert_object_type_details(
             object_details_list=object_details_list,
-            object_type="tests_integration.test_cache_examples.MemalotObject",
+            object_type="tests_integration.test_cache_examples.LeakyObject",
             expected_count=1,
-            expected_target_names={"MemalotObject (object)"},
+            expected_target_names={"LeakyObject (object)"},
         )
 
         # Verify ndarray
@@ -257,7 +257,7 @@ class TestCacheExampleContextManager:
             expected_root_names=expected_root_names,
         )
 
-        # Iteration 3: exactly 1 new MemalotObject and 1 ndarray (same as iteration 2)
+        # Iteration 3: exactly 1 new LeakyObject and 1 ndarray (same as iteration 2)
         iteration_3 = full_report.iterations[2]
         assert iteration_3.iteration_number == 3
 
@@ -282,8 +282,8 @@ class TestCacheExampleMultipleCalls:
         This test verifies that:
         - Only objects that survive for 2 calls are reported as leaks
         - PreviousObject instances are NOT reported since they only survive 1 call
-        - MemalotObjects that survive multiple calls ARE reported
-        - Type summaries contain only MemalotObject and numpy.ndarray types
+        - LeakyObjects that survive multiple calls ARE reported
+        - Type summaries contain only LeakyObject and numpy.ndarray types
         """
 
         # given: a create_and_cache function with min_object_age_calls=2
@@ -293,7 +293,7 @@ class TestCacheExampleMultipleCalls:
             output_func=lambda _: None,
         )
         def create_and_cache(cache: Cache, previous_list: list[Any]) -> None:
-            cache.cache_list.append(create_memalot_object())
+            cache.cache_list.append(create_leaky_object())
             previous_list[0] = PreviousObject(2)
 
         cache = Cache()
@@ -314,7 +314,7 @@ class TestCacheExampleMultipleCalls:
         assert iteration_1.iteration_number == 1
         assert_warmup_iteration(iteration=iteration_1)
 
-        # Iteration 2: exactly 1 new MemalotObject and 1 ndarray
+        # Iteration 2: exactly 1 new LeakyObject and 1 ndarray
         # PreviousObject should NOT be reported as it only survives 1 call
         iteration_2 = full_report.iterations[1]
         assert iteration_2.iteration_number == 2
@@ -322,7 +322,7 @@ class TestCacheExampleMultipleCalls:
         # Check type summaries - should NOT include PreviousObject
         type_summaries = iteration_2.leak_summary.type_summaries
         expected_types = {
-            "tests_integration.test_cache_examples.MemalotObject",
+            "tests_integration.test_cache_examples.LeakyObject",
             "numpy.ndarray",
         }
         expected_counts = {1}
@@ -345,12 +345,12 @@ class TestCacheExampleMultipleCalls:
         )
         assert len(previous_object_details_list) == 0
 
-        # Verify MemalotObject
+        # Verify LeakyObject
         assert_object_type_details(
             object_details_list=object_details_list,
-            object_type="tests_integration.test_cache_examples.MemalotObject",
+            object_type="tests_integration.test_cache_examples.LeakyObject",
             expected_count=1,
-            expected_target_names={"MemalotObject (object)"},
+            expected_target_names={"LeakyObject (object)"},
         )
 
         # Verify ndarray
@@ -372,7 +372,7 @@ class TestCacheExampleMultipleCalls:
             expected_root_names=expected_root_names,
         )
 
-        # Iteration 3: exactly 1 new MemalotObject and 1 ndarray (same as iteration 2)
+        # Iteration 3: exactly 1 new LeakyObject and 1 ndarray (same as iteration 2)
         iteration_3 = full_report.iterations[2]
         assert iteration_3.iteration_number == 3
 
