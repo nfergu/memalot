@@ -2,9 +2,9 @@
 <br />
 <br />
 
-Memalot finds [memory leaks](#definition-of-a-leak) in Python programs. Memalot prints suspected leaks to the console by default, and also has a CLI and an MCP server for analyzing memory leaks.  
+Memalot finds [memory leaks](#definition-of-a-leak) in Python programs. Memalot prints suspected leaks to the console by default, and also has a [CLI](#cli) and an [MCP server](#mcp-server) for analyzing memory leaks.  
 
-For example, given this Python program which creates a string object every half a second:
+For example, here is a Python program which creates a string object every half second:
 
 ```python
 from time import sleep
@@ -21,11 +21,11 @@ def my_function():
 my_function()
 ```
 
-After a short delay, Memalot will print a report like this to the comnole:
-
-**Note**: memalot may slow down your program, so be wary of using it in a production system.
+The `max_object_lifetime` parameter means that Memalot will find objects that have lived for longer than one second. After a short delay, Memalot will print a report like this to the comnole:
 
 <img width="541" height="584" alt="image" src="https://github.com/user-attachments/assets/ca07a085-aaee-4332-96bf-6a43d98fa161" />
+
+**Note**: memalot may slow down your program, so be wary of using it in a production system.
 
 ## Installation
 
@@ -52,12 +52,11 @@ import memalot
 memalot.start_leak_monitoring(max_object_lifetime=60.0)
 ```
 
-This will periodically print out potential memory leaks to the console. An object is considered a potential leak if it lives for more than `max_object_lifetime` seconds. For more details on
-this parameter see [Object Lifetime](#object_lifetime).
+This will periodically print out potential memory leaks to the console. An object is considered a potential leak if it lives for more than `max_object_lifetime` seconds (in this case, 60 seconds).
 
 ### Function-based Leak Discovery
 
-To get started with function-based leak discovery, wrap your code in the `leak_monitor` decorator:
+To get started with function-based leak discovery, wrap your code in the `@leak_monitor` decorator:
 
 ```python
 from memalot import leak_monitor
@@ -67,8 +66,7 @@ def function_that_leaks_memory():
     # Code that leaks memory here
 ```
 
-In this case, when the function exits, Memalot will print out potential memory leaks.
-That is, objects created while the function was being called, which cannot be garbage collected.
+In this case, when the function exits, Memalot will print out potential memory leaks. That is, objects created while the function was being called, which cannot be garbage collected.
 
 You can also ask Memalot to only consider objects that have lived for more than a certain number of calls to the function. For example: 
 
@@ -80,12 +78,15 @@ def function_that_leaks_memory(max_object_age_calls=2):
     # Code that leaks memory here
 ```
 
-The `max_object_age_calls` parameter asks Memalot to only consider _objects that have been created while the function was being called, and have survived two calls to the function_. 
+In this case the `max_object_age_calls=2` parameter asks Memalot to only consider _objects that have been created while the function was being called, and have survived two calls to the function_. 
 
-Note: you should *not* call `memalot.start_leak_monitoring` when using function-based leak
-discovery.
+Note: you should *not* call `memalot.start_leak_monitoring` when using function-based leak discovery.
 
 Note: function-based leak discovery will not work well if other threads are creating objects outside the function while it is being called. Use [time-based Leak Discovery](#time-based-leak-discovery) in this case.
+
+## CLI
+
+## MCP Server
 
 ## Definition of a Leak
 
@@ -95,6 +96,7 @@ However, note that Memalot cannot distinguish between objects that live for a lo
 
 ## Limitations
 
+- Memalot is slow. Be wary of using it in a production system.
 - Memalot does not guarantee to find *all* leaking objects. If you have leaking objects that are
   created very rarely, Memalot may not detect them. Specifically:
   - Memalot does not find objects that are created while the leak report is being generated. This is mostly applicable to time-based leak discovery.
