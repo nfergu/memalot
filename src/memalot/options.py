@@ -70,7 +70,11 @@ class Options:
     """
     Whether to check for referrers of leaked objects. Defaults to `True`.
 
-    Note: this option may cause significant slow-down (but provides useful information).
+    This option may cause a significant slow-down (but provides useful information).
+    Try setting this to `False` if Memalot is taking a long time to generate object details.
+    Then, when you have an idea of what types of objects are leaking, you can generate reports
+    with `check_referrers=True` and `included_type_names` set to the types of objects that you
+    think may be leaking.
     """
 
     max_object_details: int = 30
