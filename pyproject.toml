@@ -1,8 +1,12 @@
 [project]
 name = "memalot"
-version = "0.6.0"
-requires-python = "~=3.10"
+version = "0.7.0"
 description = "Finds memory leaks in Python programs"
+authors = ["Neil Ferguson"]
+license = "Apache-2.0"
+readme = "README.md"
+repository = "https://github.com/nfergu/referrers"
+requires-python = "~=3.10"
 dependencies = [
     "referrers>=0.16.0",
     "rich>=13.0",
