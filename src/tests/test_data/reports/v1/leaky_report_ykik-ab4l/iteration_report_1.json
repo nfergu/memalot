@@ -1,0 +1,1 @@
+{"report_id":"ykik-ab4l","iteration_number":1,"start_time":"2025-09-29T20:53:39.730399Z","end_time":"2025-09-29T20:53:39.730399Z","memory_usage":{"current_rss_bytes":66060288,"peak_rss_bytes":67993600,"system_percent_used":0.128173828125},"leak_summary":{"iteration":1,"type_summaries":[],"max_types_in_summary":500},"object_details_list":[]}

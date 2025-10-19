@@ -1,0 +1,1 @@
+{"report_id":"d6wf-uw2w","iteration_number":1,"start_time":"2025-09-29T20:54:19.078977Z","end_time":"2025-09-29T20:54:19.078977Z","memory_usage":{"current_rss_bytes":68894720,"peak_rss_bytes":70057984,"system_percent_used":0.13367335001627606},"leak_summary":{"iteration":1,"type_summaries":[],"max_types_in_summary":500},"object_details_list":[]}
