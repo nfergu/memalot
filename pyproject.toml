@@ -7,7 +7,6 @@ authors = [
 ]
 license = "Apache-2.0"
 readme = "README.md"
-repository = "https://github.com/nfergu/referrers"
 requires-python = "~=3.10"
 dependencies = [
     "referrers>=0.16.0",
@@ -17,6 +16,9 @@ dependencies = [
     "objsize>=0.7",
     "networkx>=2.8",
 ]
+
+[project.urls]
+Repository = "https://github.com/nfergu/referrers"
 
 [project.scripts]
 memalot = "memalot.cli:main"
