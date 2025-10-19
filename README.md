@@ -84,13 +84,13 @@ def function_that_leaks_memory(max_object_age_calls=2):
 
 In this case the `max_object_age_calls=2` parameter asks Memalot to only consider _objects that have been created while the function was being called, and have survived two calls to the function_.
 
-Function-based leak discovery may not be accurate if other threads are creating objects outside the function while it is being called. Memalot cannot detect objects that are created within a specific function, only _while a particular function is being called_. If this causes problems for you, use [time-based Leak Discovery](#time-based-leak-discovery) instead.
+Function-based leak discovery may not be accurate if other threads are creating objects outside the function while it is being called. Memalot cannot detect objects that are created _within_ a specific function, only _while the function is being called_. If this causes problems for you, use [time-based Leak Discovery](#time-based-leak-discovery) instead.
 
 Note: you should *not* call `memalot.start_leak_monitoring` when using function-based leak discovery.
 
 ## Filtering
 
-Memalot can be used to filter the types of objects that are considered leaks. This can speed up leak discovery significantly if you know which types of objects are likely to be leaks.
+Memalot can be used to filter the types of objects that are considered leaks. This can speed up leak discovery significantly if you know what types of objects are likely to be leaks.
 
 To filter object types, pass the `included_type_names` parameter with the type names that you wish to include. For example:
 
@@ -98,9 +98,9 @@ To filter object types, pass the `included_type_names` parameter with the type n
 memalot.start_leak_monitoring(max_object_lifetime=60.0, included_type_names={"mypackage.MyObject", "OtherObject"})
 ```
 
-This will only include objects with `mypackage.MyObject` or `OtherObject` in their fully qualified type name. Matching is performed on substrings, so `mypackage.MyObject` will match `mypackage.MyObjectSubclass` as well.
+This will only include objects with `mypackage.MyObject` or `OtherObject` in their fully qualified type name. Matching is based on substrings, so `mypackage.MyObject` will match `mypackage.MyObjectSubclass` as well.
 
-You can also exclude certain types of objects from being considered leaks. Use the `excluded_type_names` option for this. For example:
+You can also exclude certain types of objects from being considered as leaks. Use the `excluded_type_names` option for this. For example:
 
 ```python
 memalot.start_leak_monitoring(max_object_lifetime=60.0, included_type_names={"builtins"}, excluded_type_names={"dict"})
@@ -137,7 +137,7 @@ Or to rsync all reports from a remote machine to your local machine:
 rsync -avh --progress alice@remote_host:/home/alice/.memalot/reports/ /home/alice/.memalot/reports/
 ```
 
-There is a small chance of report ID collisions if you copy reports between machines (although this is relatively unlikely, since report IDs are 8 alphanumeric characters). To avoid report collisions, use a different `report_directory` on each machine you copy reports from.
+There is a small chance of report ID collisions if you copy reports between machines (although this is relatively unlikely, since report IDs are 8 alphanumeric characters). To avoid report collisions, use a different `report_directory` for each machine you copy reports from.
 
 ## CLI
 
