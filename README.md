@@ -21,11 +21,13 @@ def my_function():
 my_function()
 ```
 
-In this example the `memalot.start_leak_monitoring(max_object_lifetime=1.0)` line tells Memalot to find objects that have lived for longer than one second and identity them as potential leaks. After a short delay, Memalot will print a report like this to the console:
+In this example, the `memalot.start_leak_monitoring(max_object_lifetime=1.0)` line tells Memalot to find objects that have lived for longer than one second and identity them as potential leaks. After a short delay, Memalot will print a report like this to the console:
 
 <img width="541" height="584" alt="image" src="https://github.com/user-attachments/assets/ca07a085-aaee-4332-96bf-6a43d98fa161" />
 
-**Note**: memalot may slow down your program, so be wary of using it in a production system.
+Memalot has identified that some string objects are leaking, and has printed details about the first object, including its referrers (the references to the object that are keeping it alive), its size and its string representation. 
+
+**Note**: Memalot may slow down your program, so be wary of using it in a production system.
 
 ## Installation
 
@@ -82,7 +84,7 @@ def function_that_leaks_memory(max_object_age_calls=2):
 
 In this case the `max_object_age_calls=2` parameter asks Memalot to only consider _objects that have been created while the function was being called, and have survived two calls to the function_.
 
-Function-based leak discovery will not work well if other threads are creating objects outside the function while it is being called. Use [time-based Leak Discovery](#time-based-leak-discovery) in this case.
+Function-based leak discovery may not be accurate if other threads are creating objects outside the function while it is being called. Memalot cannot detect objects that are created within a specific function, only _while a particular function is being called_. If this causes problems for you, use [time-based Leak Discovery](#time-based-leak-discovery) instead.
 
 Note: you should *not* call `memalot.start_leak_monitoring` when using function-based leak discovery.
 
