@@ -22,7 +22,7 @@ Repository = "https://github.com/nfergu/referrers"
 
 [project.scripts]
 memalot = "memalot.cli:main"
-memalot-mcp = "memalot.mcp_server:main"
+memalot-mcp = "memalot.mcp_server.main:run_mcp_server"
 
 [project.optional-dependencies]
 test = [

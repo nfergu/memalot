@@ -115,7 +115,7 @@ def get_leak_report(
         return full_report
 
 
-def main() -> None:  # pragma: no cover
+def run_mcp_server() -> None:  # pragma: no cover
     """
     Run the Memalot MCP server.
     """
@@ -123,4 +123,4 @@ def main() -> None:  # pragma: no cover
 
 
 if __name__ == "__main__":  # pragma: no cover
-    main()
+    run_mcp_server()
