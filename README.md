@@ -23,6 +23,7 @@ my_function()
 
 In this example, the `memalot.start_leak_monitoring(max_object_lifetime=1.0)` line tells Memalot to find objects that have lived for longer than one second and identity them as potential leaks. After a short delay, Memalot will print a report like this to the console:
 
+<br />
 <img width="541" height="584" alt="image" src="https://github.com/user-attachments/assets/ca07a085-aaee-4332-96bf-6a43d98fa161" />
 
 Memalot has identified that some string objects are leaking, and has printed details about the first object, including its referrers (the references to the object that are keeping it alive), its size and its string representation. 

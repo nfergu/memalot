@@ -1,10 +1,9 @@
 [project]
-name = "python-memalot-mcp-server"
-version = "0.5.2"
-requires-python = "~=3.10"
+name = "memalot-mcp-server"
+version = "0.1.0"
+requires-python = ">=3.10"
 description = "MCP Server for Memalot"
 dependencies = [
     "fastmcp>=2.12",
-    # TODO: Change this to a proper release, or rework how this is done when it is installed properly
-    "python-memalot @ file:///Users/neil/workspaces/memalot"
+    "memalot>=0.7.0"
 ]
