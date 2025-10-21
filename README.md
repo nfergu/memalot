@@ -164,7 +164,83 @@ memalot print --help
 
 ## MCP Server
 
-TODO: Write this section.
+\Memalot has an MCP server that can be used to analyze memory leaks via your favorite AI tool. The MCP server uses the [stdio transport](https://modelcontextprotocol.io/docs/learn/architecture#transport-layer) so you need to run it on the same machine as the AI tool. 
+
+## Installation
+
+Before installing the MCP server, **make sure you have [installed UV](https://docs.astral.sh/uv/getting-started/installation/)** on your machine.
+
+[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=Memalot&config=eyJjb21tYW5kIjoidXZ4IC0tcHl0aG9uID49My4xMCAtLWZyb20gbWVtYWxvdFttY3BdIG1lbWFsb3QtbWNwIn0%3D)
+
+[![Add MCP Server memalot to LM Studio](https://files.lmstudio.ai/deeplink/mcp-install-light.svg)](https://lmstudio.ai/install-mcp?name=memalot&config=eyJjb21tYW5kIjoidXZ4IiwiYXJncyI6WyItLXB5dGhvbiIsIj49My4xMCIsIi0tZnJvbSIsIm1lbWFsb3RbbWNwXSIsIm1lbWFsb3QtbWNwIl19)
+
+[![Install in VS Code](https://img.shields.io/badge/VS_Code-Install_Memalot-0098FF?style=flat&logo=visualstudiocode&logoColor=ffffff)](vscode:mcp/install?%7B%22name%22%3A%22Memalot%22%2C%22type%22%3A%22stdio%22%2C%22command%22%3A%22uvx%22%2C%22args%22%3A%5B%22--python%22%2C%22%3E%3D3.10%22%2C%22--from%22%2C%22memalot%5Bmcp%5D%22%2C%22memalot-mcp%22%5D%7D)
+
+### General Configuration
+
+To run the MCP server, you'll need to specify the following in your AI tool:
+
+- Name: `Memalot`
+- Command: `uvx`
+- Arguments: `--python >=3.10 --from memalot[mcp] memalot-mcp`
+
+However, the precise way you do this varies depending on the specific client you are using. See below for instructions for some popular clients.
+
+### JSON Configuration
+
+For clients that support JSON configuration of MCP servers (for example, Cursor, Claude Desktop), add the following to your JSON configuration:
+
+```json
+{
+    "Memalot": {
+        "command": "uvx",
+        "args": [
+            "--python", ">=3.10", "--from", "memalot[mcp]", "memalot-mcp"
+        ]
+    }
+}
+```
+
+Note: you *may* have to specify the full path to the `uvx` executable in some cases, even if it is on your path. You can find this by running `which uvx` from the command line. Try this if you get an error like "spawn uvx ENOENT" when starting the MCP server.
+
+## Claude Code
+
+Run this command:
+
+```bash
+claude mcp add Memalot -- uvx --python '>=3.10' --from memalot[mcp] memalot-mcp
+```
+
+## Codex CLI
+
+Run this command:
+
+```bash
+codex mcp add Memalot -- uvx --python '>=3.10' --from memalot[mcp] memalot-mcp
+```
+
+## Example Prompts
+
+Before you can use the MCP server, you'll need to generate some reports if you haven't already. See the [Getting Started](#getting-started) section for more details.
+
+Here are some things you can ask the MCP server to do:
+
+- "List Memalot leak reports"
+- "List the most recent 10 Memalot leak reports from report directory /memalot_reports"
+- "Analyse the most recent iteration of memalot report <report-id>" (where <report-id> is a valid report ID)
+- "Analyse the most recent iteration of memalot report <report-id>. Filter to include MyObject objects only."
+- "Fix the memory leak in memalot report <report-id>"
+- "Analyze the referrer graph for objects of type MyObject for memalot report <report-id>"
+- "Create a diagram of the references to leaking objects in memalot report <report-id>"
+- "Create a comprehensive HTML report for memalot report <report-id>"
+
+## Tips for Using the MCP Server
+
+- If the context window is being exceeded, try the following:
+  - Ask the AI tool to filter on specific object type names. This is performed in the MCP server, so reduces the amount of information sent to the client.
+  - Set the `max_object_details` option to a smaller value when generating the report.
+- By default, only the most recent iteration of a report is returned. You can ask your AI tool to retrieve more iterations if you wish.  
+- By default, the MCP server will look for reports in the default directory. However, you can ask your AI tool to look in a specific directory if you have saved reports elsewhere. 
 
 ## Options
 
