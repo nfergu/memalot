@@ -184,11 +184,11 @@ To run the MCP server, you'll need to specify the following in your AI tool:
 - Command: `uvx`
 - Arguments: `--python >=3.10 --from memalot[mcp] memalot-mcp`
 
-However, the precise way you do this varies depending on the specific client you are using. See below for instructions for some popular clients.
+However, the precise way you do this varies depending on the specific tool you are using. See below for instructions for some popular tools.
 
 ### JSON Configuration
 
-For clients that support JSON configuration of MCP servers (for example, Cursor, Claude Desktop), add the following to your JSON configuration:
+For tools that support JSON configuration of MCP servers (for example, Cursor, Claude Desktop), add the following to your JSON configuration:
 
 ```json
 {
