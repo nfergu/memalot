@@ -164,7 +164,7 @@ memalot print --help
 
 ## MCP Server
 
-\Memalot has an MCP server that can be used to analyze memory leaks via your favorite AI tool. The MCP server uses the [stdio transport](https://modelcontextprotocol.io/docs/learn/architecture#transport-layer) so you need to run it on the same machine as the AI tool. 
+Memalot has an MCP server that can be used to analyze leak reports using your favorite AI tool. The MCP server uses the [stdio transport](https://modelcontextprotocol.io/docs/learn/architecture#transport-layer) so you need to run it on the same machine as the AI tool. 
 
 ## Installation
 
