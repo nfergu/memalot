@@ -18,7 +18,7 @@ dependencies = [
 ]
 
 [project.urls]
-Repository = "https://github.com/nfergu/referrers"
+Repository = "https://github.com/nfergu/memalot"
 
 [project.scripts]
 memalot = "memalot.cli:main"
