@@ -2,7 +2,9 @@
 <br />
 <br />
 
-Memalot finds [memory leaks](#definition-of-a-leak) in Python programs. Memalot prints suspected leaks to the console by default, and also has a [CLI](#cli) and an [MCP server](#mcp-server) for analyzing memory leaks.  
+Memalot finds [memory leaks](#definition-of-a-leak) in Python programs.
+
+Memalot prints suspected leaks to the console by default, and also has a [CLI](#cli) and an [MCP server](#mcp-server) for analyzing memory leaks.  
 
 For example, here is a Python program which creates a string object every half-second and stores these in a list:
 
