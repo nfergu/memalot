@@ -242,6 +242,10 @@ Here are some things you can ask the MCP server to do:
 - By default, only the most recent iteration of a report is returned. You can ask your AI tool to retrieve more iterations if you wish.  
 - By default, the MCP server will look for reports in the default directory. However, you can ask your AI tool to look in a specific directory if you have saved reports elsewhere. 
 
+## Referrers
+
+Memalot uses the [Referrers](https://pypi.org/project/referrers/) package (by the same author as Memalot) to show the referrers of objects. These are the references to the object that are keeping it alive. There are a number of options that can be used to control the behaviour of this. See [Referrer Tracking Options](#referrer-tracking-options) for more details.
+
 ## Options
 
 Memalot has a number of options that can be used to customize its behavior. Pass these options to `start_leak_monitoring` or `@leak_monitor`. For example:
