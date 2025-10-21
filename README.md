@@ -6,7 +6,7 @@ Memalot finds [memory leaks](#definition-of-a-leak) in Python programs.
 
 Memalot prints suspected leaks to the console by default, and also has a [CLI](#cli) and an [MCP server](#mcp-server) for analyzing memory leaks.  
 
-For example, here is a Python program which creates a string object every half-second and stores these in a list:
+For example, here is a Python program that creates a string object every half-second and stores these in a list:
 
 ```python
 from time import sleep
@@ -175,8 +175,6 @@ Before installing the MCP server, **make sure you have [installed UV](https://do
 [![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=Memalot&config=eyJjb21tYW5kIjoidXZ4IC0tcHl0aG9uID49My4xMCAtLWZyb20gbWVtYWxvdFttY3BdIG1lbWFsb3QtbWNwIn0%3D)
 
 [![Add MCP Server memalot to LM Studio](https://files.lmstudio.ai/deeplink/mcp-install-light.svg)](https://lmstudio.ai/install-mcp?name=memalot&config=eyJjb21tYW5kIjoidXZ4IiwiYXJncyI6WyItLXB5dGhvbiIsIj49My4xMCIsIi0tZnJvbSIsIm1lbWFsb3RbbWNwXSIsIm1lbWFsb3QtbWNwIl19)
-
-[![Install in VS Code](https://img.shields.io/badge/VS_Code-Install_Memalot-0098FF?style=flat&logo=visualstudiocode&logoColor=ffffff)](vscode:mcp/install?%7B%22name%22%3A%22Memalot%22%2C%22type%22%3A%22stdio%22%2C%22command%22%3A%22uvx%22%2C%22args%22%3A%5B%22--python%22%2C%22%3E%3D3.10%22%2C%22--from%22%2C%22memalot%5Bmcp%5D%22%2C%22memalot-mcp%22%5D%7D)
 
 ### General Configuration
 
