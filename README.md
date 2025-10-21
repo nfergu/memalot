@@ -164,7 +164,7 @@ To get help, run a command with the `--help` flag. For example:
 memalot print --help
 ```
 
-## MCP Server
+## MCP Server<a id="mcp-server"></a>
 
 Memalot has an MCP server that can be used to analyze leak reports using your favorite AI tool. The MCP server uses the [stdio transport](https://modelcontextprotocol.io/docs/learn/architecture#transport-layer) so you need to run it on the same machine as the AI tool. 
 
