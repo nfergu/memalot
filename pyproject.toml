@@ -1,6 +1,6 @@
 [project]
 name = "memalot"
-version = "0.7.2"
+version = "1.0"
 description = "Finds memory leaks in Python programs"
 authors = [
     { name = "Neil Ferguson" },
