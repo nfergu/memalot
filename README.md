@@ -26,7 +26,7 @@ In this example, the `memalot.start_leak_monitoring(max_object_lifetime=1.0)` li
 <br />
 <img width="541" height="584" alt="image" src="https://github.com/user-attachments/assets/ca07a085-aaee-4332-96bf-6a43d98fa161" />
 
-Memalot has identified that some string objects are leaking, and has printed details about the first object, including its referrers (the references to the object that are keeping it alive), its size and its string representation. 
+Memalot has identified that some string objects are leaking, and has printed details about the first object, including its referrers (the references to the object that are keeping it alive), its size and its string representation.
 
 **Note**: Memalot may slow down your program, so be wary of using it in a production system.
 
@@ -142,15 +142,15 @@ There is a small chance of report ID collisions if you copy reports between mach
 
 ## CLI
 
-Memalot has a basic CLI that can be used to analyze memory leaks.
+Memalot has a basic CLI that can be used to view stored reports.
 
-To list leaks, run:
+To list reports, run:
 
 ```bash
 memalot list
 ```
 
-To print a report for a specific leak, run:
+To print a specific report, run:
 
 ```bash
 memalot print <report_id>
