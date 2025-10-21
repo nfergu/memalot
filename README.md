@@ -225,14 +225,14 @@ Before you can use the MCP server, you'll need to generate some reports if you h
 
 Here are some things you can ask the MCP server to do:
 
-- "List Memalot leak reports"
-- "List the most recent 10 Memalot leak reports from report directory /memalot_reports"
-- "Analyse the most recent iteration of memalot report <report-id>" (where <report-id> is a valid report ID)
-- "Analyse the most recent iteration of memalot report <report-id>. Filter to include MyObject objects only."
-- "Fix the memory leak in memalot report <report-id>"
-- "Analyze the referrer graph for objects of type MyObject for memalot report <report-id>"
-- "Create a diagram of the references to leaking objects in memalot report <report-id>"
-- "Create a comprehensive HTML report for memalot report <report-id>"
+- "List memalot leak reports"
+- "List the most recent 10 memalot leak reports from report directory /var/memalot_reports"
+- "Analyse the most recent iteration of memalot report \<report-id\>"
+- "Analyse the most recent iteration of memalot report \<report-id\>. Filter to include MyObject objects only."
+- "Fix the memory leak in memalot report \<report-id\>"
+- "Analyze the referrer graph for objects of type MyObject for memalot report \<report-id\>"
+- "Create a diagram of the references to leaking objects in memalot report \<report-id\>"
+- "Create a comprehensive HTML report for memalot report \<report-id\>"
 
 ## Tips for Using the MCP Server
 
