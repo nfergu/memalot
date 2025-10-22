@@ -45,7 +45,7 @@ pip3 install memalot
 Memalot can identify suspected memory leaks in one of these ways:
 
 - [Time-based Leak Discovery](#time-based-leak-discovery). Identifies objects that have lived for more than a certain amount of time without being garbage collected. This is most suitable for web servers and other programs that process short-lived requests, and multithreaded programs. 
-- [Function-based Leak Discovery](#iteration-based-leak-discovery). Identifies objects that have been created while a specific function is being called, but have not yet been garbage collected. This is most suitable for single-threaded batch processing systems or other long-lived jobs.
+- [Function-based Leak Discovery](#function-based-leak-discovery). Identifies objects that have been created while a specific function is being called, but have not yet been garbage collected. This is most suitable for single-threaded batch processing systems or other long-lived jobs.
 
 ### Time-based Leak Discovery<a id="time-based-leak-discovery"></a>
 
