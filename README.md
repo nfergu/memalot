@@ -80,8 +80,8 @@ You can also ask Memalot to only consider objects that have lived for more than 
 ```python
 from memalot import leak_monitor
 
-@leak_monitor
-def function_that_leaks_memory(max_object_age_calls=2):
+@leak_monitor(max_object_age_calls=2)
+def function_that_leaks_memory():
     # Code that leaks memory here
 ```
 
