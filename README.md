@@ -219,7 +219,7 @@ codex mcp add Memalot -- uvx --python '>=3.10' --from memalot[mcp] memalot-mcp
 
 ### Copilot Coding Agent
 
-Adding the following JSON coinfiguration to your [repository's MCP configuration](https://docs.github.com/en/enterprise-cloud@latest/copilot/how-tos/use-copilot-agents/coding-agent/extend-coding-agent-with-mcp):
+Adding the following JSON configuration to your [repository's MCP configuration](https://docs.github.com/en/enterprise-cloud@latest/copilot/how-tos/use-copilot-agents/coding-agent/extend-coding-agent-with-mcp):
 
 ```json
 "Memalot": {
