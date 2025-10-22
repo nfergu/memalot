@@ -191,13 +191,11 @@ However, the precise way you do this varies depending on the specific tool you a
 For tools that support JSON configuration of MCP servers (for example, Cursor, Claude Desktop), add the following to your JSON configuration:
 
 ```json
-{
-    "Memalot": {
-        "command": "uvx",
-        "args": [
-            "--python", ">=3.10", "--from", "memalot[mcp]", "memalot-mcp"
-        ]
-    }
+"Memalot": {
+    "command": "uvx",
+    "args": [
+        "--python", ">=3.10", "--from", "memalot[mcp]", "memalot-mcp"
+    ]
 }
 ```
 
@@ -217,6 +215,21 @@ Run this command:
 
 ```bash
 codex mcp add Memalot -- uvx --python '>=3.10' --from memalot[mcp] memalot-mcp
+```
+
+### Copilot Coding Agent
+
+Adding the following JSON coinfiguration to your [repository's MCP configuration](https://docs.github.com/en/enterprise-cloud@latest/copilot/how-tos/use-copilot-agents/coding-agent/extend-coding-agent-with-mcp):
+
+```json
+"Memalot": {
+    "type": "local",
+    "tools": ["*"],
+    "command": "uvx",
+    "args": [
+        "--python", ">=3.10", "--from", "memalot[mcp]", "memalot-mcp"
+    ]
+}
 ```
 
 ## Example Prompts<a id="example-prompts"></a>
