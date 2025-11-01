@@ -4,7 +4,7 @@
 
 Memalot finds [memory leaks](#definition-of-a-leak) in Python programs.
 
-Memalot prints suspected leaks to the console by default, and also has a [CLI](#cli) and an [MCP server](#mcp-server) for analyzing memory leaks.  
+Memalot prints suspected leaks to the console by default, and also has a [CLI](#cli) and an [MCP server](#mcp-server) for analyzing memory leaks.
 
 For example, here is a Python program that creates a string object every half-second and stores these in a list:
 
@@ -30,7 +30,7 @@ In this example, the `memalot.start_leak_monitoring(max_object_lifetime=1.0)` li
 
 Memalot has identified that some string objects are leaking, and has printed details about the first object, including its referrers (the references to the object that are keeping it alive), its size and its string representation.
 
-**Note**: Memalot may slow down your program, so be wary of using it in a production system.
+**Note**: Memalot may slow down your program, so be wary of using it in a production system. Additionally, Memalot can use a lot of memory itself (but it should not _leak_ memory!) so make sure you have plenty of RAM available.
 
 ## Installation<a id="installation"></a>
 
@@ -347,3 +347,9 @@ However, note that Memalot cannot distinguish between objects that live for a lo
   created very rarely, Memalot may not detect them. Specifically:
   - Memalot does not find objects that are created while the leak report is being generated. This is mostly applicable to time-based leak discovery.
   - If the `max_object_age_calls` parameter is set to greater than 1 during function-based leak discovery, Memalot will not find objects that are created on some calls to the function.
+
+## Leaks Found by Memalot
+
+Memalot has been used to track down leaks in [TensorFlow](https://github.com/tensorflow/tensorflow/issues/97697#issuecomment-3157515788), [TensorFlow Probability](https://github.com/tensorflow/probability/issues/2008), [Pydantic](https://github.com/pydantic/pydantic/issues/12446), and more. 
+
+If you use Memalot successfully in an open source project, please let us know by tagging @nfergu in Github.
