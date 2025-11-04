@@ -737,7 +737,7 @@ wheels = [
 
 [[package]]
 name = "memalot"
-version = "0.7.2"
+version = "1.0.8"
 source = { virtual = "." }
 dependencies = [
     { name = "networkx", version = "3.4.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
