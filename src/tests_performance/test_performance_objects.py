@@ -119,12 +119,13 @@ class TestMassObjectCreationPerformance:
             create_objects(500_000)
             create_objects(500_000)
 
-        benchmark.pedantic(run_object_creation, rounds=1)
+        benchmark.pedantic(run_object_creation, rounds=1)  # type: ignore
 
         # Based on preliminary testing, the test should complete in well under 40 seconds
         # on average, even on Github's workers (this is about 4x what it takes on a fast laptop).
         # This assertion allows for some variability but catches very significant performance
         # regressions.
+        assert benchmark.stats is not None
         assert benchmark.stats.stats.mean < 40.0, (
             f"Performance regression detected: mean time {benchmark.stats.stats.mean:.2f}s "
             f"exceeds 40.0s"
@@ -143,12 +144,13 @@ class TestMassObjectCreationPerformance:
             create_tuples(500_000)
             create_tuples(500_000)
 
-        benchmark.pedantic(run_object_creation, rounds=1)
+        benchmark.pedantic(run_object_creation, rounds=1)  # type: ignore
 
         # Based on preliminary testing, the test should complete in well under 80 seconds
         # on average, even on Github's workers (this is about 4x what it takes on a fast laptop).
         # This assertion allows for some variability but catches very significant performance
         # regressions.
+        assert benchmark.stats is not None
         assert benchmark.stats.stats.mean < 80.0, (
             f"Performance regression detected: mean time {benchmark.stats.stats.mean:.2f}s "
             f"exceeds 80.0s"

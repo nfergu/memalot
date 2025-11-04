@@ -74,12 +74,13 @@ class TestBarbellPerformance:
             add_nodes_to_end(end_node, 3)
             add_nodes_to_end(end_node, 3)
 
-        benchmark.pedantic(run_barbell, rounds=1)
+        benchmark.pedantic(run_barbell, rounds=1)  # type: ignore
 
         # Based on preliminary testing, the test should complete in well under 200 seconds
         # on average, even on Github's workers (this is about 4x what it takes on a fast laptop).
         # This assertion allows for some variability but catches very significant performance
         # regressions.
+        assert benchmark.stats is not None
         assert benchmark.stats.stats.mean < 200.0, (
             f"Performance regression detected: mean time {benchmark.stats.stats.mean:.2f}s "
             f"exceeds 200s"
