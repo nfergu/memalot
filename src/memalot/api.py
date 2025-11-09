@@ -483,7 +483,7 @@ def leak_monitor(
 
 
 def create_leak_monitor(
-    warmup_calls: int = 0,
+    warmup_calls: int = 1,
     max_object_age_calls: int = 1,
     included_type_names: AbstractSet[str] = frozenset(),
     excluded_type_names: AbstractSet[str] = frozenset(),
