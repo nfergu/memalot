@@ -32,7 +32,7 @@ In this example, the `memalot.start_leak_monitoring(max_object_lifetime=1.0)` li
 
 Memalot has identified that some string objects are leaking, and has printed details about the first object, including its referrers (the references to the object that are keeping it alive), its size and its string representation.
 
-**Note**: Memalot may slow down your program, so be wary of using it in a production system. Additionally, Memalot can use a lot of memory itself (but it should not _leak_ memory!) so make sure you have plenty of RAM available.
+**Note**: Memalot is experimental! Memalot may slow down your program. Additionally, Memalot can use a lot of memory itself (but it should not _leak_ memory!) so make sure you have plenty of RAM available. We advise against using Memalot in production or in any system where performance is important.
 
 ## Installation<a id="installation"></a>
 
@@ -92,6 +92,19 @@ In this case the `max_object_age_calls=2` parameter asks Memalot to only conside
 Function-based leak discovery may not be accurate if other threads are creating objects outside the function while it is being called. Memalot cannot detect objects that are created _within_ a specific function, only _while the function is being called_. If this causes problems for you, use [time-based Leak Discovery](#time-based-leak-discovery) instead.
 
 Note: you should *not* call `memalot.start_leak_monitoring` when using function-based leak discovery.
+
+## Context Manager<a id="context-manager"></a>
+
+Memalot can also be used as a context manager. This has the same behaviour as [function-based Leak Discovery](#function-based-leak-discovery), except that the context manager can be used to monitor a block of code rather than an entire function.
+
+To use Memalot as a context manager, call `create_leak_monitor` _once_, and then use the returned object as a context manager each time you want to monitor memory leaks in a specific block of code. For example:
+
+```python
+monitor = create_leak_monitor()
+
+with monitor:
+    # Code that leaks memory here
+```
 
 ## Filtering<a id="filtering"></a>
 
@@ -320,19 +333,6 @@ memalot.start_leak_monitoring(max_object_lifetime=60.0, force_terminal=True, max
 ### Other Options<a id="other-options"></a>
 
 - **`max_untracked_search_depth`** (int, default: 3): The maximum search depth when looking for leaked objects that are not tracked by the garbage collector. Untracked objects include, for example, mutable objects and collections containing only immutable objects in CPython. This defaults to 3, which is enough to find most untracked objects. However, this may not be sufficient to find some untracked objects, like nested tuples. Increase this if you have nested collections of immutable objects (like tuples). However, note that increasing this may impact speed.
-
-## Context Manager<a id="context-manager"></a>
-
-Memalot _can_ be used as a context manager. However, it is generally recommended to use the `@leak_monitor` decorator instead, unless this is not possible.
-
-To use Memalot as a context manager, call `create_leak_monitor` once, and then use the returned object as a context manager each time you want to monitor memory leaks. For example:
-
-```python
-monitor = create_leak_monitor()
-
-with monitor:
-    # Code that leaks memory here
-```
 
 Note: it is important to call `create_leak_monitor` only once and reuse the returned object each time you want to monitor memory leaks.
 

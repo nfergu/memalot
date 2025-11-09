@@ -42,7 +42,7 @@ def create_graph(m1: int, m2: int) -> tuple[dict[str, Node], Node]:
 
 @leak_monitor(
     check_referrers=True,
-    min_object_age_calls=1,
+    max_object_age_calls=1,
     max_object_details=2,
     # Set output to nowhere
     output_func=lambda _: None,

@@ -228,7 +228,7 @@ R = TypeVar("R")
 def leak_monitor(
     func: None = None,
     warmup_calls: int = 1,
-    min_object_age_calls: int = 1,
+    max_object_age_calls: int = 1,
     included_type_names: AbstractSet[str] = frozenset(),
     excluded_type_names: AbstractSet[str] = frozenset(),
     max_types_in_leak_summary: int = 500,
@@ -257,7 +257,7 @@ def leak_monitor(
 def leak_monitor(
     func: Callable[P, R] | None = None,
     warmup_calls: int = 1,
-    min_object_age_calls: int = 1,
+    max_object_age_calls: int = 1,
     included_type_names: AbstractSet[str] = frozenset(),
     excluded_type_names: AbstractSet[str] = frozenset(),
     max_types_in_leak_summary: int = 500,
@@ -284,7 +284,7 @@ def leak_monitor(
 def leak_monitor(
     func: Callable[P, R] | None = None,
     warmup_calls: int = 1,
-    min_object_age_calls: int = 1,
+    max_object_age_calls: int = 1,
     included_type_names: AbstractSet[str] = frozenset(),
     excluded_type_names: AbstractSet[str] = frozenset(),
     max_types_in_leak_summary: int = 500,
@@ -309,21 +309,21 @@ def leak_monitor(
     """
     Decorator to monitor for memory leaks. After `warmup_calls` warmup calls, object that are
     created while the decorated function is being called and are still alive after
-    `min_object_age_calls` calls will be identified as a potential leak.
+    `max_object_age_calls` calls will be identified as a potential leak.
 
-    A memory leak report is printed to the console every `min_object_age_calls` calls to the
+    A memory leak report is printed to the console every `max_object_age_calls` calls to the
     decorated function.
 
-    By default, `warmup_calls` and `min_object_age_calls` are both set to `1`, so after the first
+    By default, `warmup_calls` and `max_object_age_calls` are both set to `1`, so after the first
     call, leaks will be identified on every call.
 
     The `warmup_calls` parameter can be changed if data is created on some number of initial calls
     to the decorated function, but not created after that.
 
-    The `min_object_age_calls` parameter can be changed if data created by the decorated function
+    The `max_object_age_calls` parameter can be changed if data created by the decorated function
     is permitted to live for a certain number of calls. Only objects that have lived for
-    `min_object_age_calls` calls will be reported as potential leaks. For example, if
-    `min_object_age_calls` is set to `2`, objects must live for two calls to be considered as
+    `max_object_age_calls` calls will be reported as potential leaks. For example, if
+    `max_object_age_calls` is set to `2`, objects must live for two calls to be considered as
     potential leaks.
 
     Note: this decorator will not work well if other threads are creating objects outside the
@@ -335,7 +335,7 @@ def leak_monitor(
     :param warmup_calls: The number of warmup calls. No leaks will be detected until this
         many calls have been made to the decorated function.
 
-    :param min_object_age_calls: The number of calls to the decorated function that an object
+    :param max_object_age_calls: The number of calls to the decorated function that an object
         must survive for to be considered a potential leak.
 
     :param included_type_names: The types of objects to include in the report. By default,
@@ -441,7 +441,7 @@ def leak_monitor(
         decorated_function_name = target_func.__name__
         monitor = create_leak_monitor(
             warmup_calls=warmup_calls,
-            min_object_age_calls=min_object_age_calls,
+            max_object_age_calls=max_object_age_calls,
             included_type_names=included_type_names,
             excluded_type_names=excluded_type_names,
             max_types_in_leak_summary=max_types_in_leak_summary,
@@ -483,8 +483,8 @@ def leak_monitor(
 
 
 def create_leak_monitor(
-    warmup_calls: int = 1,
-    min_object_age_calls: int = 1,
+    warmup_calls: int = 0,
+    max_object_age_calls: int = 1,
     included_type_names: AbstractSet[str] = frozenset(),
     excluded_type_names: AbstractSet[str] = frozenset(),
     max_types_in_leak_summary: int = 500,
@@ -515,21 +515,21 @@ def create_leak_monitor(
         # Code that leaks memory here
 
     After `warmup_calls` warmup calls, any object that is created within the context manager and
-    is still alive after `min_object_age_calls` calls will be identified as a potential leak.
+    is still alive after `max_object_age_calls` calls will be identified as a potential leak.
 
-    A memory leak report is printed to the console every `min_object_age_calls` calls to the
+    A memory leak report is printed to the console every `max_object_age_calls` calls to the
     decorated function.
 
-    By default, `warmup_calls` and `min_object_age_calls` are both set to `1`, so after the first
+    By default, `warmup_calls` and `max_object_age_calls` are both set to `1`, so after the first
     call, leaks will be identified on every call.
 
     The `warmup_calls` parameter can be changed if data is created on some number of initial calls
     to the decorated function, but not created after that.
 
-    The `min_object_age_calls` parameter can be changed if data created by the decorated function
+    The `max_object_age_calls` parameter can be changed if data created by the decorated function
     is permitted to live for a certain number of calls. Only objects that have lived for
-    `min_object_age_calls` calls will be reported as potential leaks. For example, if
-    `min_object_age_calls` is set to `2`, objects must live for two calls to be considered as
+    `max_object_age_calls` calls will be reported as potential leaks. For example, if
+    `max_object_age_calls` is set to `2`, objects must live for two calls to be considered as
     potential leaks.
 
     Note: this context manager will not work well if other threads are creating objects
@@ -539,7 +539,7 @@ def create_leak_monitor(
     :param warmup_calls: The number of warmup calls. No leaks will be detected until this
         many calls have been made to the decorated function.
 
-    :param min_object_age_calls: The number of calls to the decorated function that an object
+    :param max_object_age_calls: The number of calls to the decorated function that an object
         must survive for to be considered a potential leak.
 
     :param included_type_names: The types of objects to include in the report. By default,
@@ -681,7 +681,7 @@ def create_leak_monitor(
         writer=writer,
         report_writer=report_writer,
         warmup_calls=warmup_calls,
-        calls_per_report=min_object_age_calls,
+        calls_per_report=max_object_age_calls,
         options=options,
         snapshot_manager=snapshot_manager,
         object_getter=object_getter,
@@ -692,9 +692,9 @@ def create_leak_monitor(
             RichOutput(
                 f"Memalot is performing leak monitoring for the "
                 f"[{FUNCTION_NAME}]{function_name}[/{FUNCTION_NAME}] function. "
-                f"After {warmup_calls} warmup {pluralize('call', min_object_age_calls)}, "
+                f"After {warmup_calls} warmup {pluralize('call', max_object_age_calls)}, "
                 f"objects that are created while this function is being called and are still alive "
-                f"after {min_object_age_calls} {pluralize('call', min_object_age_calls)} will "
+                f"after {max_object_age_calls} {pluralize('call', max_object_age_calls)} will "
                 f"be identified as potential leaks."
             )
         )
@@ -702,9 +702,9 @@ def create_leak_monitor(
         writer.write(
             RichOutput(
                 f"Memalot is performing leak monitoring using a context manager. "
-                f"After {warmup_calls} warmup {pluralize('call', min_object_age_calls)}, objects "
+                f"After {warmup_calls} warmup {pluralize('call', max_object_age_calls)}, objects "
                 f"that are created while the context manager is being called and are still "
-                f"alive after {min_object_age_calls} {pluralize('call', min_object_age_calls)} "
+                f"alive after {max_object_age_calls} {pluralize('call', max_object_age_calls)} "
                 f"will be identified as potential leaks."
             )
         )

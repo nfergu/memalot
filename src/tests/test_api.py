@@ -274,7 +274,7 @@ class TestLeakMonitorDecorator:
         Test that the leak_monitor decorator works with different parameter combinations.
         """
 
-        @leak_monitor(warmup_calls=warmup_calls, min_object_age_calls=max_object_age_calls)
+        @leak_monitor(warmup_calls=warmup_calls, max_object_age_calls=max_object_age_calls)
         def test_function(value: int) -> int:
             return value * 2
 
@@ -284,7 +284,7 @@ class TestLeakMonitorDecorator:
         mock_create_leak_monitor.assert_called_once_with(
             function_name="test_function",
             warmup_calls=warmup_calls,
-            min_object_age_calls=max_object_age_calls,
+            max_object_age_calls=max_object_age_calls,
             included_type_names=frozenset(),
             excluded_type_names=frozenset(),
             max_types_in_leak_summary=500,
@@ -341,7 +341,7 @@ class TestLeakMonitorDecorator:
 
             @leak_monitor(
                 warmup_calls=2,
-                min_object_age_calls=3,
+                max_object_age_calls=3,
                 force_terminal=kwargs["force_terminal"],
                 color=kwargs["color"],
             )
@@ -352,7 +352,7 @@ class TestLeakMonitorDecorator:
 
             @leak_monitor(
                 warmup_calls=2,
-                min_object_age_calls=3,
+                max_object_age_calls=3,
                 max_types_in_leak_summary=kwargs["max_types_in_leak_summary"],
                 check_referrers=kwargs["check_referrers"],
             )
@@ -363,7 +363,7 @@ class TestLeakMonitorDecorator:
 
             @leak_monitor(
                 warmup_calls=2,
-                min_object_age_calls=3,
+                max_object_age_calls=3,
                 max_object_details=kwargs["max_object_details"],
                 referrers_max_depth=kwargs["referrers_max_depth"],
             )
@@ -380,7 +380,7 @@ class TestLeakMonitorDecorator:
         expected_call_kwargs = {
             "function_name": "test_function",
             "warmup_calls": 2,
-            "min_object_age_calls": 3,
+            "max_object_age_calls": 3,
             "included_type_names": frozenset(),
             "excluded_type_names": frozenset(),
             "max_types_in_leak_summary": 500,
@@ -432,7 +432,7 @@ class TestLeakMonitorDecorator:
         mock_create_leak_monitor.assert_called_once_with(
             function_name="test_function",
             warmup_calls=1,
-            min_object_age_calls=1,
+            max_object_age_calls=1,
             included_type_names=frozenset(),
             excluded_type_names=frozenset(),
             max_types_in_leak_summary=500,
@@ -481,7 +481,7 @@ class TestCreateLeakMonitor:
 
         result = create_leak_monitor(
             warmup_calls=5,
-            min_object_age_calls=3,
+            max_object_age_calls=3,
         )
 
         assert result == mock_leak_monitor_impl

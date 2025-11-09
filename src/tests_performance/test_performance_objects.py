@@ -60,7 +60,7 @@ class TypeE:
 
 @leak_monitor(
     check_referrers=False,
-    min_object_age_calls=1,
+    max_object_age_calls=1,
     max_object_details=2,
     # Set output to nowhere
     output_func=lambda _: None,
@@ -87,7 +87,7 @@ def create_objects(num_objects: int) -> list[Any]:
 
 @leak_monitor(
     check_referrers=False,
-    min_object_age_calls=1,
+    max_object_age_calls=1,
     max_object_details=2,
     # Set output to nowhere
     output_func=lambda _: None,

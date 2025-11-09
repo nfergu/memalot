@@ -272,12 +272,12 @@ class TestCacheExampleContextManager:
 @pytest.mark.integration
 class TestCacheExampleMultipleCalls:
     """
-    Tests for the cache example with min_object_age_calls parameter.
+    Tests for the cache example with max_object_age_calls parameter.
     """
 
     def test_cache_example_multiple_calls(self, tmp_path: Path) -> None:
         """
-        Tests that the cache example with min_object_age_calls=2 generates expected report.
+        Tests that the cache example with max_object_age_calls=2 generates expected report.
 
         This test verifies that:
         - Only objects that survive for 2 calls are reported as leaks
@@ -286,9 +286,9 @@ class TestCacheExampleMultipleCalls:
         - Type summaries contain only LeakyObject and numpy.ndarray types
         """
 
-        # given: a create_and_cache function with min_object_age_calls=2
+        # given: a create_and_cache function with max_object_age_calls=2
         @leak_monitor(
-            min_object_age_calls=2,
+            max_object_age_calls=2,
             report_directory=tmp_path,
             output_func=lambda _: None,
         )
@@ -305,7 +305,7 @@ class TestCacheExampleMultipleCalls:
 
         # then: read the report from disk and verify
         full_report = read_single_report(tmp_path=tmp_path)
-        # With min_object_age_calls=2, we need objects to survive 2 calls
+        # With max_object_age_calls=2, we need objects to survive 2 calls
         # So after 5 calls, we get: 1 warmup + 2 reporting iterations
         assert_iteration_count(full_report=full_report, expected_count=3)
 
