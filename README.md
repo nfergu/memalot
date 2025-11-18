@@ -259,7 +259,7 @@ You can also access Memalot's documentation via an MCP server. Use [GitMCP](http
 
 ### Example Prompts<a id="example-prompts"></a>
 
-Before you can use the MCP server, you'll need to generate some reports if you haven't already. See the [Getting Started](#getting-started) section for more details.
+Before you can use the MCP server, you'll need to generate some reports if you haven't already. See the [Getting Started](#getting-started) section for more details, or try pointing your AI tool at the [Memalot documentation](https://pypi.org/project/memalot/) and asking it to do this for you.
 
 Here are some things you can ask the MCP server to do:
 
@@ -271,6 +271,10 @@ Here are some things you can ask the MCP server to do:
 - "Analyze the referrer graph for objects of type MyObject for memalot report \<report-id\>"
 - "Create a diagram of the references to leaking objects in memalot report \<report-id\>"
 - "Create a comprehensive HTML report for memalot report \<report-id\>"
+
+### End-to-end Example<a id="end-to-end-example"></a>
+
+AI tools may be able to perform end-to-end fixing of memory leaks if you give them a sufficiently simple example. That is they may be able to instrument your code using Memalot, analyse the leak report via the Memalot MCP server, and fix the memory leak. See [this simple example](https://github.com/nfergu/memalot_examples/tree/main/src/memalot-examples/sized_cache), which can be used to try out this process.
 
 ### Tips for Using the MCP Server<a id="tips-for-using-the-mcp-server"></a>
 
