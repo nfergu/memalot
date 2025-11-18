@@ -283,7 +283,7 @@ Here are some things you can ask the MCP server to do:
 ## Hints and Tips
  
 - If Memalot is running slowly or using a lot of memory, try [filtering](#filtering) to reduce the number of objects that Memalot needs to analyze.
-- If Memalot is taking a long time to find referrers, try setting the `check_referrers` parameter to `False`. This will enable you to see what types of objects are leaking, and then potentially apply [filtering][#filtering].
+- If Memalot is taking a long time to find referrers, try setting the `check_referrers` parameter to `False`. This will enable you to see what types of objects are leaking, and then potentially apply [filtering](#filtering).
 - Be patient! Memalot can be very slow, but it should tell you what you need to know eventually.
 - Memalot can use a lot of memory (but it should not _leak_ memory!). Ensure you have plenty of RAM available.
 - If you expect to see referrers for an object but no referrers are found, this may mean one of the following:
