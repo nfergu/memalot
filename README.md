@@ -278,10 +278,10 @@ AI tools _may_ be able to perform end-to-end fixing of memory leaks if you give 
 
 See [this simple example](https://github.com/nfergu/memalot_examples/tree/main/src/memalot-examples/sized_cache), which can be used to try out this end-to-end process.
 
-### Tips for Using the MCP Server<a id="tips-for-using-the-mcp-server"></a>
+### MCP Server Hints and Tips<a id="tips-for-using-the-mcp-server"></a>
 
 - If the context window is being exceeded, try the following:
-  - Ask the AI tool to filter on specific object type names. This is performed in the MCP server, so reduces the amount of information sent to the client.
+  - Ask the AI tool to filter on specific object type names. This is performed in the Memalot MCP server, so reduces the amount of information sent to the client.
   - Set the `max_object_details` option to a smaller value when generating the report.
 - By default, only the most recent iteration of a report is returned. You can ask your AI tool to retrieve more iterations if you wish.  
 - By default, the MCP server will look for reports in the default directory. However, you can ask your AI tool to look in a specific directory if you have saved reports elsewhere. 
