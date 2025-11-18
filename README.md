@@ -155,6 +155,12 @@ Or to rsync all reports from a remote machine to your local machine:
 rsync -avh --progress alice@remote_host:/home/alice/.memalot/reports/ /home/alice/.memalot/reports/
 ```
 
+Or to copy a report from a docker container to your local machine:
+
+```bash
+docker cp <CONTAINER ID>:/home/alice/.memalot/reports/memalot_report_51dq-p2ey /Users/alive/.memalot/reports/
+```
+
 There is a small chance of report ID collisions if you copy reports between machines (although this is relatively unlikely, since report IDs are 8 alphanumeric characters). To avoid report collisions, use a different `report_directory` for each machine you copy reports from.
 
 ## CLI<a id="cli"></a>
@@ -183,7 +189,7 @@ memalot print --help
 
 Memalot has an MCP server that can be used to analyze leak reports using your favorite AI tool. The MCP server uses the [stdio transport](https://modelcontextprotocol.io/docs/learn/architecture#transport-layer) so you need to run it on the same machine as the AI tool. 
 
-## MCP Server Installation<a id="mcp-server-installation"></a>
+### MCP Server Installation<a id="mcp-server-installation"></a>
 
 Before installing the MCP server, **make sure you have [installed UV](https://docs.astral.sh/uv/getting-started/installation/)** on your machine.
 
@@ -191,7 +197,7 @@ Before installing the MCP server, **make sure you have [installed UV](https://do
 
 [![Add MCP Server memalot to LM Studio](https://files.lmstudio.ai/deeplink/mcp-install-light.svg)](https://lmstudio.ai/install-mcp?name=memalot&config=eyJjb21tYW5kIjoidXZ4IiwiYXJncyI6WyItLXB5dGhvbiIsIj49My4xMCIsIi0tZnJvbSIsIm1lbWFsb3RbbWNwXSIsIm1lbWFsb3QtbWNwIl19)
 
-### General Configuration
+#### General Configuration
 
 To run the MCP server, you'll need to specify the following in your AI tool:
 
@@ -201,7 +207,7 @@ To run the MCP server, you'll need to specify the following in your AI tool:
 
 However, the precise way you do this varies depending on the specific tool you are using. See below for instructions for some popular tools.
 
-### JSON Configuration<a id="json-configuration"></a>
+#### JSON Configuration<a id="json-configuration"></a>
 
 For tools that support JSON configuration of MCP servers (for example, Cursor, Claude Desktop), add the following to your JSON configuration:
 
@@ -216,7 +222,7 @@ For tools that support JSON configuration of MCP servers (for example, Cursor, C
 
 Note: you *may* have to specify the full path to the `uvx` executable in some cases, even if it is on your path. You can find this by running `which uvx` from the command line. Try this if you get an error like "spawn uvx ENOENT" when starting the MCP server.
 
-### Claude Code
+#### Claude Code
 
 Run this command:
 
@@ -224,7 +230,7 @@ Run this command:
 claude mcp add Memalot -- uvx --python '>=3.10' --from memalot[mcp] memalot-mcp
 ```
 
-### Codex CLI
+#### Codex CLI
 
 Run this command:
 
@@ -232,7 +238,7 @@ Run this command:
 codex mcp add Memalot -- uvx --python '>=3.10' --from memalot[mcp] memalot-mcp
 ```
 
-### Copilot Coding Agent
+#### Copilot Coding Agent
 
 Adding the following JSON configuration to your [repository's MCP configuration](https://docs.github.com/en/enterprise-cloud@latest/copilot/how-tos/use-copilot-agents/coding-agent/extend-coding-agent-with-mcp):
 
@@ -247,7 +253,11 @@ Adding the following JSON configuration to your [repository's MCP configuration]
 }
 ```
 
-## Example Prompts<a id="example-prompts"></a>
+### Documentation MCP Server<a id="documentation-mcp-server"></a>
+
+You can also access Memalot's documentation via an MCP server. Use [GitMCP](https://gitmcp.io/) and point it at this repository: [https://github.com/nfergu/memalot](https://github.com/nfergu/memalot).
+
+### Example Prompts<a id="example-prompts"></a>
 
 Before you can use the MCP server, you'll need to generate some reports if you haven't already. See the [Getting Started](#getting-started) section for more details.
 
@@ -262,7 +272,7 @@ Here are some things you can ask the MCP server to do:
 - "Create a diagram of the references to leaking objects in memalot report \<report-id\>"
 - "Create a comprehensive HTML report for memalot report \<report-id\>"
 
-## Tips for Using the MCP Server<a id="tips-for-using-the-mcp-server"></a>
+### Tips for Using the MCP Server<a id="tips-for-using-the-mcp-server"></a>
 
 - If the context window is being exceeded, try the following:
   - Ask the AI tool to filter on specific object type names. This is performed in the MCP server, so reduces the amount of information sent to the client.
@@ -349,6 +359,15 @@ However, note that Memalot cannot distinguish between objects that live for a lo
   created very rarely, Memalot may not detect them. Specifically:
   - Memalot does not find objects that are created while the leak report is being generated. This is mostly applicable to time-based leak discovery.
   - If the `max_object_age_calls` parameter is set to greater than 1 during function-based leak discovery, Memalot will not find objects that are created on some calls to the function.
+- Memalot may incorrectly identify leaking objects in rare cases. Specifically, if an object is not weakly-referencable, there is a higher chance that Memalot will incorrectly identify it as leaking. For objects that are not weakly-referencable, Memalot uses heuristics to determine if two objects are the same, but this is not always accurate.
+
+## FAQS<a id="faqs"></a>
+
+### Why does Memalot report "No referrers found" for an object?
+
+This can happen if the object has recently become eligible for garbage collection. For example, Memalot identified it as a leaking object, but between that point and the object details being printed, the object became eligible for garbage collection. In this Memalot case is the only thing (temporarily) keeping the object alive. 
+
+This _may_ also happen if an object is kept alive by native code.
 
 ## Leaks Found by Memalot
 
