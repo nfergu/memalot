@@ -100,6 +100,8 @@ Memalot can also be used as a context manager. This has the same behaviour as [f
 To use Memalot as a context manager, call `create_leak_monitor` _once_, and then use the returned object as a context manager each time you want to monitor memory leaks in a specific block of code. For example:
 
 ```python
+from memalot import create_leak_monitor
+
 monitor = create_leak_monitor()
 
 with monitor:
