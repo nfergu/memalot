@@ -272,9 +272,11 @@ Here are some things you can ask the MCP server to do:
 - "Create a diagram of the references to leaking objects in memalot report \<report-id\>"
 - "Create a comprehensive HTML report for memalot report \<report-id\>"
 
-### End-to-end Example<a id="end-to-end-example"></a>
+### End-to-end AI Tool Example<a id="end-to-end-example"></a>
 
-AI tools may be able to perform end-to-end fixing of memory leaks if you give them a sufficiently simple example. That is they may be able to instrument your code using Memalot, analyse the leak report via the Memalot MCP server, and fix the memory leak. See [this simple example](https://github.com/nfergu/memalot_examples/tree/main/src/memalot-examples/sized_cache), which can be used to try out this process.
+AI tools _may_ be able to perform end-to-end fixing of memory leaks if you give them a sufficiently simple example. That is they may be able to instrument your code using Memalot, analyse the leak report via the Memalot MCP server, and fix the memory leak.
+
+See [this simple example](https://github.com/nfergu/memalot_examples/tree/main/src/memalot-examples/sized_cache), which can be used to try out this end-to-end process.
 
 ### Tips for Using the MCP Server<a id="tips-for-using-the-mcp-server"></a>
 
