@@ -280,6 +280,18 @@ Here are some things you can ask the MCP server to do:
 - By default, only the most recent iteration of a report is returned. You can ask your AI tool to retrieve more iterations if you wish.  
 - By default, the MCP server will look for reports in the default directory. However, you can ask your AI tool to look in a specific directory if you have saved reports elsewhere. 
 
+## Hints and Tips
+ 
+- If Memalot is running slowly or using a lot of memory, try [filtering](#filtering) to reduce the number of objects that Memalot needs to analyze.
+- If Memalot is taking a long time to find referrers, try setting the `check_referrers` parameter to `False`. This will enable you to see what types of objects are leaking, and then potentially apply [filtering][#filtering].
+- Be patient! Memalot can be very slow, but it should tell you what you need to know eventually.
+- Memalot can use a lot of memory (but it should not _leak_ memory!). Ensure you have plenty of RAM available.
+- If you expect to see referrers for an object but no referrers are found, this may mean one of the following:
+  - The object has been garbage collected before its referrers could be analyzed.
+  - The object is being prevented from being destroyed by native code.
+  - Python is not able to find the referrers of the object.
+- Try setting the [Referrer Tracking Options](#referrer-tracking-options) if the referrer graph is incomplete (for example timing-out, or not showing all referrers).
+
 ## Referrers<a id="referrers"></a>
 
 Memalot uses the [Referrers](https://pypi.org/project/referrers/) package (by the same author as Memalot) to show the referrers of objects. These are the references to the object that are keeping it alive. There are a number of options that can be used to control the behaviour of this. See [Referrer Tracking Options](#referrer-tracking-options) for more details.
